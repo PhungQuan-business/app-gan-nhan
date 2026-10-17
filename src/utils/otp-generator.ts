@@ -12,6 +12,13 @@ function generateOTP(length: number = 6): string {
   // crypto.randomInt(min, max + 1) is inclusive of min and exclusive of (max + 1)
   const otp = crypto.randomInt(min, max + 1);
   return otp.toString().padStart(length, '0');
+  debugger;
 }
 
 export default generateOTP;
+
+// For debugging purposes, run this file directly in Javascript debug terminal to see a generated OTP.
+import { fileURLToPath } from "node:url";
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  console.log(generateOTP(6));
+}

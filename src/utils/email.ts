@@ -1,12 +1,7 @@
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
-import { dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
 
-const configDir = dirname(fileURLToPath(import.meta.url));
-dotenv.config({
-  path: resolve(__dirname, "../.env"), 
-});
+dotenv.config();
 
 function sentOtpToEmail(email: string, otp: string): boolean {
   // Create a transporter object using SMTP transport
@@ -42,3 +37,9 @@ function sentOtpToEmail(email: string, otp: string): boolean {
 }
 
 export default sentOtpToEmail;
+
+// For debugging purposes, run this file directly in Javascript debug terminal to see a generated OTP.
+import { fileURLToPath } from "node:url";
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  console.log(sentOtpToEmail("phunghongquan.business@gmail.com", "123456")); // Replace with a valid email for testing
+}

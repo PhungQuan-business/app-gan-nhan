@@ -1,7 +1,7 @@
 // services/auth.service.ts
 
-import generateOtp from "../../utils/otp-generator.js";
-import sentOtpToEmail from "../../utils/email.js";
+import generateOtp from "../utils/otp-generator.js";
+import sentOtpToEmail from "../utils/email.js";
 
 export async function login(email: string, password: string) {
     // TODO: Implement login logic, e.g., check credentials, generate JWT, etc.

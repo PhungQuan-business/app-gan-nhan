@@ -1,80 +1,13 @@
-// controllers/auth.controller.ts
+import { Router } from "express";
+import * as authController from "./auth.controller.js";
 
-import type { Request, Response, NextFunction } from "express";
-import * as authService from "./auth.service.js";
+const router: Router = Router();
 
-export async function requestOtp(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) {
-  try {
-    const { email } = req.body;
+router.post("/login", authController.login);
+router.post("/request-otp", authController.requestOtp);
+router.post("/verify-otp", authController.verifyOtp);
+router.post("/complete-signup", authController.completeSignup);
+// add more auth routes here as needed
 
-    const result = await authService.sendOtp(email);
 
-    res.status(202).json({
-      success: true,
-      data: result,
-    });
-  } catch (error) {
-    next(error);
-  }
-}
-
-export async function verifyOtp(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) {
-  try {
-    const { email, otp } = req.body;
-
-    const result = await authService.verifyOtp(email, otp);
-
-    res.status(200).json({
-      success: true,
-      data: result,
-    });
-  } catch (error) {
-    next(error);
-  }
-}
-
-export async function completeSignup(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) {
-  try {
-    const { email, password } = req.body;
-
-    const result = await authService.completeSignup(email, password);
-
-    res.status(201).json({
-      success: true,
-      data: result,
-    });
-  } catch (error) {
-    next(error);
-  }
-}
-
-export async function login(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) {
-  try {
-    const { email, password } = req.body;
-
-    const result = await authService.login(email, password);
-
-    res.status(200).json({
-      success: true,
-      data: result,
-    });
-  } catch (error) {
-    next(error);
-  }
-}
+export default router;
