@@ -46,7 +46,10 @@ export async function sendOtp(email: string) {
 
     console.info(`[OTP] Successfully saved OTP for ${email}`);
 
-    return result;
+    return {
+        message: "OTP sent successfully",
+        expiresIn: 300,
+    };
     } catch (error) {
         console.error(`[OTP] Failed to save OTP for ${email}:`, error);
         throw new Error("Failed to save OTP to the database");

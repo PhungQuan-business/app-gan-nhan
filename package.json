@@ -7,9 +7,9 @@
     "dev": "tsx watch src/server.ts",
     "test": "vitest",
     "db:check": "tsx ./scripts/prisma-smoke-test.ts",
+    "db:validate": "prisma validate",
     "db:generate": "prisma generate",
-    "db:migrate": "prisma migrate dev --name",
-    "db:validate": "prisma validate"
+    "db:migrate": "prisma migrate dev --name"
   },
   "keywords": [],
   "author": "",
@@ -24,14 +24,19 @@
   "packageManager": "pnpm@12.11.2",
   "type": "module",
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/express": "^5.0.6",
     "@types/node": "^26.6.5",
     "dotenv": "^18.0.7",
+    "eslint": "^9.39.5",
+    "globals": "^17.13.0",
     "prisma": "^7.10.0",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "tsx": "^4.23.15",
-    "typescript": "^7.0.2",
+    "typescript": "npm:@typescript/typescript6@^6.0.0",
+    "typescript-7": "npm:typescript@^7.0.0",
+    "typescript-eslint": "^8.71.2",
     "vitest": "^5.0.5"
   },
   "dependencies": {
