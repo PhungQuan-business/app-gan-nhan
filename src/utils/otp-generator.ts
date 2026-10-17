@@ -1,5 +1,4 @@
-import nodemailer from "nodemailer"; // this is for sending emails
-import { createHmac, randomInt } from "node:crypto";
+import { createHmac } from "node:crypto";
 import * as crypto from 'crypto';
 import { fileURLToPath } from "node:url";
 import dotenv from "dotenv";
@@ -15,7 +14,6 @@ export function generateOTP(length: number = 6): string {
   // crypto.randomInt(min, max + 1) is inclusive of min and exclusive of (max + 1)
   const otp = crypto.randomInt(min, max + 1);
   return otp.toString().padStart(length, '0');
-  debugger;
 }
 
 export function hashOtp(otp: string, secret: string): string {

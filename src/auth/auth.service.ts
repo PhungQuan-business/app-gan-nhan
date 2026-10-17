@@ -6,7 +6,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-export async function login(email: string, password: string) {
+export async function login() {
     // TODO: Implement login logic, e.g., check credentials, generate JWT, etc.
 }
 
@@ -26,7 +26,7 @@ export async function sendOtp(email: string) {
     // TODO: Store OTP with an expiration time.
 
     try {
-        const result = await prisma.emailOtp.upsert({
+        await prisma.emailOtp.upsert({
             where: {
             email,
             },
@@ -42,7 +42,7 @@ export async function sendOtp(email: string) {
             },
         });
 
-    const status = sentOtpToEmail(email, otp);
+    sentOtpToEmail(email, otp);
 
     console.info(`[OTP] Successfully saved OTP for ${email}`);
 
@@ -52,16 +52,16 @@ export async function sendOtp(email: string) {
     };
     } catch (error) {
         console.error(`[OTP] Failed to save OTP for ${email}:`, error);
-        throw new Error("Failed to save OTP to the database");
+        throw new Error("Failed to save OTP to the database", {cause: error});
     }
-    
-}
-
-export async function verifyOtp(email: string, otp: string) {
 
 }
 
-export async function completeSignup(email: string, password: string) {
+export async function verifyOtp() {
+
+}
+
+export async function completeSignup() {
 
 }
 
