@@ -30,7 +30,7 @@ export async function verifyOtp(
   try {
     const { email, otp } = req.body;
 
-    const result = await authService.verifyOtp(email, otp);
+    const result = await authService.verifyOtp();
 
     res.status(200).json({
       success: true,

@@ -11,8 +11,10 @@ export async function login() {
 }
 
 export async function sendOtp(email: string) {
-    const otp = generateOTP()
+    // TODO: Make attempt filed increase everytime user request and limit 5 otp within 30p
 
+
+    const otp = generateOTP()
     const secret = process.env.OTP_SECRET;
     if (!secret) {
         throw new Error("OTP_SECRET is missing in environment variables.");
