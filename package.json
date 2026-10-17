@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "tsx watch src/server.ts",
+    "test": "vitest",
     "db:check": "tsx ./scripts/prisma-smoke-test.ts",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev --name",
@@ -30,7 +31,8 @@
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "tsx": "^4.23.15",
-    "typescript": "^7.0.2"
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.5"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.0",
