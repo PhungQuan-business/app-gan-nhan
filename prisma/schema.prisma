@@ -28,3 +28,13 @@ model EmailOtp {
 
   @@map("email_otps")
 }
+
+model SignupVerification {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@map("signup_verifications")
+}

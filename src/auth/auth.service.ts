@@ -3,7 +3,7 @@ import { prisma } from "../../config/prisma.js";
 import { generateOTP, hashOtp } from "../utils/otp-generator.js";
 import { sentOtpToEmail } from "../utils/email.js";
 import dotenv from "dotenv";
-import { timingSafeEqual } from "node:crypto";
+import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 
 dotenv.config();
 
@@ -61,6 +61,23 @@ export async function sendOtp(email: string) {
 }
 
 const MAX_OTP_ATTEMPTS = 5;
+
+/**
+ * Helper function
+ * Generates a cryptographically random signup token.
+ * Only the token's hash will be stored in the database.
+ */
+function generateSignupToken(): string {
+  return randomBytes(32).toString("base64url");
+}
+
+/**
+ * Helper function
+ * Hashes a signup token before it is stored in the database.
+ */
+function hashSignupToken(token: string): string {
+  return createHash("sha256").update(token).digest("hex");
+}
 
 /**
  * Verifies an email OTP and invalidates it after successful verification.
@@ -191,33 +208,61 @@ export async function verifyOtp(email: string, otp: string) {
         };
     }
 
-    // Consume the OTP atomically. Only one concurrent request can delete
-    // this matching, unexpired record and successfully verify it.
-    const consumeResult = await prisma.emailOtp.deleteMany({
+// Generate a token that proves the email has been verified.
+    const signupToken = generateSignupToken();
+    const tokenHash = hashSignupToken(signupToken);
+    const tokenExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+    // Consume the OTP and save the signup token in one transaction.
+    // If either database operation fails, both operations are rolled back.
+    const verificationResult = await prisma.$transaction(async (tx) => {
+    const consumeResult = await tx.emailOtp.deleteMany({
         where: {
-            id: otpRecord.id,
-            otpHash: otpRecord.otpHash,
-            expiresAt: {
-                gt: new Date(),
-            },
-            attempts: {
-                lt: MAX_OTP_ATTEMPTS,
-            },
+        id: otpRecord.id,
+        otpHash: otpRecord.otpHash,
+        expiresAt: { gt: new Date() },
+        attempts: { lt: MAX_OTP_ATTEMPTS },
         },
     });
 
+    // Another request may already have consumed or invalidated this OTP.
     if (consumeResult.count !== 1) {
-        return {
-            success: false,
-            message: "Invalid or expired OTP.",
-        };
+        return false;
     }
 
-    // The OTP has been verified and consumed.
-    // Signup-token issuance will be added separately.
+    // Create or replace the signup token for this verified email.
+    await tx.signupVerification.upsert({
+        where: { email: email },
+        create: {
+        email: email,
+        tokenHash,
+        expiresAt: tokenExpiresAt,
+        },
+        update: {
+        tokenHash,
+        expiresAt: tokenExpiresAt,
+        },
+    });
+
+    return true;
+    });
+
+    if (!verificationResult) {
     return {
-        success: true,
-        message: "OTP verified successfully.",
+        success: false,
+        message: "Invalid or expired OTP.",
+    };
+    }
+
+    // Return the plaintext token only to the client.
+    // The database stores only its hash.
+    return {
+    success: true,
+    message: "OTP verified successfully.",
+    data: {
+        signupToken,
+        expiresIn: 600,
+    },
     };
 }
 

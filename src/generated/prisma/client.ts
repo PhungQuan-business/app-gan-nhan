@@ -51,3 +51,8 @@ export type User = Prisma.UserModel
  * 
  */
 export type EmailOtp = Prisma.EmailOtpModel
+/**
+ * Model SignupVerification
+ * 
+ */
+export type SignupVerification = Prisma.SignupVerificationModel
