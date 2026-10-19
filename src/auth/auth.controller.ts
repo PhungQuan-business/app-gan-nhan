@@ -161,7 +161,7 @@ export async function verifyEmail (
       return;
     }
 
-    res.status(200).json(result);
+    next();
 
   } catch (error) {
     next(error);
