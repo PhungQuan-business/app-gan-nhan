@@ -5,16 +5,12 @@ import { sentOtpToEmail } from "../utils/email.js";
 import dotenv from "dotenv";
 import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import { hash as hashPassword } from "bcryptjs";
+import { compare } from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 dotenv.config();
 
-export async function login() {
-    // TODO: Implement login logic, e.g., check credentials, generate JWT, etc.
-}
-
-export async function sendOtp(email: string) {
-    // TODO: Make attempt filed increase everytime user request and limit 5 otp within 30p
-
+export async function verifyDulicateEmail(email: string) {
     const existingUser = await prisma.user.findUnique({
       where: {
         email: email,
@@ -27,6 +23,27 @@ export async function sendOtp(email: string) {
         message: "An account with this email already exists.",
       };
     }
+    return {
+      success: true,
+      message: "Email is available.",
+    };
+};
+
+export async function sendOtp(email: string) {
+    // TODO: Make attempt filed increase everytime user request and limit 5 otp within 30p
+
+    // const existingUser = await prisma.user.findUnique({
+    //   where: {
+    //     email: email,
+    //   },
+    // });
+
+    // if (existingUser) {
+    //   return {
+    //     success: false,
+    //     message: "An account with this email already exists.",
+    //   };
+    // }
 
     const otp = generateOTP()
     const secret = process.env.OTP_SECRET;
@@ -376,5 +393,99 @@ export async function completeSignup(
   });
 }
 
+type LoginResult =
+  | {
+      success: true;
+      message: string;
+      data: {
+        accessToken: string;
+        tokenType: "Bearer";
+        expiresIn: number;
+        user: {
+          id: number;
+          name: string | null;
+          email: string;
+        };
+      };
+    }
+  | {
+      success: false;
+      message: string;
+    };
 
+/**
+ * Authenticates a user using their email and password.
+ *
+ * Finds the user by normalized email, compares the submitted password
+ * with the stored bcrypt hash, and issues a JWT access token when the
+ * credentials are valid. The token expires after 15 minutes.
+ *
+ * Returns a generic failure message for invalid credentials to avoid
+ * revealing whether an email address is registered.
+ *
+ * @param email - Email address submitted by the user.
+ * @param password - Plaintext password submitted by the user.
+ * @returns An access token and safe user information, or a failure result.
+ * @throws Error if JWT_SECRET is missing or a database operation fails.
+ */
+export async function login(
+  email: string,
+  password: string,
+): Promise<LoginResult> {
+  const normalizedEmail = email.trim().toLowerCase();
 
+  // Ensure the JWT signing secret is configured.
+  const jwtSecret = process.env.JWT_SECRET;
+
+  if (!jwtSecret) {
+    throw new Error("JWT_SECRET is missing from environment variables.");
+  }
+
+  const user = await prisma.user.findUnique({
+    where: {
+      email: normalizedEmail,
+    },
+  });
+
+  if (!user) {
+    return {
+      success: false,
+      message: "Invalid email or password.",
+    };
+  }
+
+  const passwordMatches = await compare(password, user.password);
+
+  if (!passwordMatches) {
+    return {
+      success: false,
+      message: "Invalid email or password.",
+    };
+  }
+
+  // Issue an access token containing the user's ID as its subject.
+  const accessToken = jwt.sign(
+    {},
+    jwtSecret,
+    {
+      subject: String(user.id),
+      expiresIn: 900, // 15 minutes
+    },
+  );
+
+  // Return only public user fields; never expose the password hash.
+  return {
+    success: true,
+    message: "Login successful.",
+    data: {
+      accessToken,
+      tokenType: "Bearer",
+      expiresIn: 900,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+      },
+    },
+  };
+}

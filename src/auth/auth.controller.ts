@@ -89,20 +89,80 @@ export async function completeSignup(
   }
 }
 
+/**
+ * Handles login requests.
+ *
+ * Validates the request body, delegates credential verification to the
+ * authentication service, and returns an access token on success.
+ *
+ * @param req - Express request containing email and password.
+ * @param res - Express response used to return the login result.
+ * @param next - Express middleware callback for forwarding unexpected errors.
+ */
 export async function login(
   req: Request,
   res: Response,
   next: NextFunction,
-) {
+): Promise<void> {
   try {
     const { email, password } = req.body;
 
+    // Validate request fields before calling the authentication service.
+    if (
+      typeof email !== "string" ||
+      typeof password !== "string" ||
+      !email.trim() ||
+      !password
+    ) {
+      res.status(400).json({
+        success: false,
+        message: "Email and password are required.",
+      });
+      return;
+    }
+
     const result = await authService.login(email, password);
 
-    res.status(200).json({
-      success: true,
-      data: result,
-    });
+    // Invalid credentials receive a generic authentication error.
+    if (!result.success) {
+      res.status(401).json(result);
+      return;
+    }
+
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function verifyEmail (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const { email } = req.body;
+
+    if (
+      typeof email !== "string" ||
+      !email.trim()
+    ) {
+      res.status(400).json({
+        success: false,
+        message: "Email is required.",
+      });
+      return;
+    }
+    
+    const result = await authService.verifyDulicateEmail(email);
+
+    if (!result.success) {
+      res.status(401).json(result);
+      return;
+    }
+
+    res.status(200).json(result);
+
   } catch (error) {
     next(error);
   }
