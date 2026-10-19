@@ -4,6 +4,7 @@ import { generateOTP, hashOtp } from "../utils/otp-generator.js";
 import { sentOtpToEmail } from "../utils/email.js";
 import dotenv from "dotenv";
 import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
+import { hash as hashPassword } from "bcryptjs";
 
 dotenv.config();
 
@@ -14,6 +15,18 @@ export async function login() {
 export async function sendOtp(email: string) {
     // TODO: Make attempt filed increase everytime user request and limit 5 otp within 30p
 
+    // const existingUser = await prisma.user.findUnique({
+    //   where: {
+    //     email: email,
+    //   },
+    // });
+
+    // if (existingUser) {
+    //   return {
+    //     success: false,
+    //     message: "An account with this email already exists.",
+    //   };
+    // }
 
     const otp = generateOTP()
     const secret = process.env.OTP_SECRET;
@@ -88,6 +101,8 @@ function hashSignupToken(token: string): string {
  *
  * Incorrect attempts are counted in the database. A successfully
  * verified OTP is deleted atomically so it cannot be reused.
+ * 
+ * Generate a sign up token when OTP is verified successfully
  *
  * @param email - Email address associated with the OTP.
  * @param otp - Plaintext OTP submitted by the user.
@@ -266,8 +281,99 @@ export async function verifyOtp(email: string, otp: string) {
     };
 }
 
-export async function completeSignup() {
+/**
+ * Creates a user account after successful email verification.
+ *
+ * Validates the signup token, checks its expiration, hashes the
+ * password, creates the user, and consumes the token in a transaction.
+ */
+export async function completeSignup(
+  name: string | undefined,
+  email: string,
+  password: string,
+  signupToken: string,
+) {
+  const normalizedEmail = email.trim().toLowerCase();
 
+  // Basic input validation. Request-level validation can be added separately.
+  if (
+    !normalizedEmail ||
+    !password ||
+    !signupToken ||
+    password.length < 8
+  ) {
+    return {
+      success: false,
+      message: "Invalid signup details.",
+    };
+  }
+
+  const tokenHash = hashSignupToken(signupToken);
+
+  // Hash the password before storing it. Never save plaintext passwords.
+  const passwordHash = await hashPassword(password, 12);
+
+  return prisma.$transaction(async (tx) => {
+    // Find the verification record belonging to this email and token.
+    const verification = await tx.signupVerification.findUnique({
+      where: {
+        email: normalizedEmail,
+      },
+    });
+
+    if (!verification || verification.tokenHash !== tokenHash) {
+      return {
+        success: false,
+        message: "Invalid or expired signup token.",
+      };
+    }
+
+    if (verification.expiresAt <= new Date()) {
+      return {
+        success: false,
+        message: "Invalid or expired signup token.",
+      };
+    }
+
+    // Consume the token conditionally so concurrent requests cannot
+    // both successfully use the same verification record.
+    const consumeResult = await tx.signupVerification.deleteMany({
+      where: {
+        id: verification.id,
+        tokenHash,
+        expiresAt: { gt: new Date() },
+      },
+    });
+
+    if (consumeResult.count !== 1) {
+      return {
+        success: false,
+        message: "Invalid or expired signup token.",
+      };
+    }
+
+    // Create the account only after successfully consuming the token.
+    // The transaction rolls back token consumption if account creation fails.
+    const user = await tx.user.create({
+      data: {
+        name: name?.trim() || null,
+        email: normalizedEmail,
+        password: passwordHash,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        createdAt: true,
+      },
+    });
+
+    return {
+      success: true,
+      message: "Account created successfully.",
+      data: user,
+    };
+  });
 }
 
 

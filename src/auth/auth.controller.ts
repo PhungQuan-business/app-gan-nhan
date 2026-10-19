@@ -41,20 +41,49 @@ export async function verifyOtp(
   }
 }
 
+/**
+ * Handles signup requests after email verification.
+ */
 export async function completeSignup(
   req: Request,
   res: Response,
   next: NextFunction,
 ) {
   try {
-    const { email, password } = req.body;
+    const { name, email, password, signupToken } = req.body;
 
-    const result = await authService.completeSignup(email, password);
+    // Validate required fields before calling the service.
+    if (
+      typeof email !== "string" ||
+      typeof password !== "string" ||
+      typeof signupToken !== "string" ||
+      (name !== undefined && typeof name !== "string")
+    ) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid signup details.",
+      });
+      return;
+    }
 
-    res.status(201).json({
-      success: true,
-      data: result,
-    });
+    const result = await authService.completeSignup(
+      name,
+      email,
+      password,
+      signupToken,
+    );
+
+    if (!result.success) {
+      const status =
+        result.message === "An account with this email already exists."
+          ? 409
+          : 400;
+
+      res.status(status).json(result);
+      return;
+    }
+
+    res.status(201).json(result);
   } catch (error) {
     next(error);
   }
