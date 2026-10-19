@@ -15,18 +15,18 @@ export async function login() {
 export async function sendOtp(email: string) {
     // TODO: Make attempt filed increase everytime user request and limit 5 otp within 30p
 
-    // const existingUser = await prisma.user.findUnique({
-    //   where: {
-    //     email: email,
-    //   },
-    // });
+    const existingUser = await prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+    });
 
-    // if (existingUser) {
-    //   return {
-    //     success: false,
-    //     message: "An account with this email already exists.",
-    //   };
-    // }
+    if (existingUser) {
+      return {
+        success: false,
+        message: "An account with this email already exists.",
+      };
+    }
 
     const otp = generateOTP()
     const secret = process.env.OTP_SECRET;
