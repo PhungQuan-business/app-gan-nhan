@@ -8,6 +8,8 @@ export default tseslint.config(
       "node_modules/**",
       "dist/**",
       "src/generated/prisma/**",
+      ".venv/**",
+      ".pytest_cache/**"
     ],
   },
   js.configs.recommended,
