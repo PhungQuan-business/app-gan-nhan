@@ -1,8 +1,9 @@
 # AGENTS.md
 
-This repository is designed for long-running coding-agent work. The goal is not
-to maximize raw code output. The goal is to leave the repo in a state where the
-next session can continue without guessing.
+Whatever action you can do yourself, please do yourself. This include starting apps and performing verification.
+
+## Project overview
+
 
 ## Startup Workflow
 
@@ -33,6 +34,10 @@ feature work on top of a broken starting state.
 - `agent-progress.md`: session log and current verified status
 - `init.sh`: standard startup and verification path
 - `session-handoff.md`: optional compact handoff for larger sessions
+
+## Coding Style & Naming Conventions
+
+Write ESM TypeScript with explicit types at public boundaries. Follow ESLint (`pnpm lint`) as the formatting and correctness authority. Use lowercase kebab-case filenames with role suffixes: `auth.service.ts`, `user.controller.ts`, and `auth.route.ts`. Name functions and variables in `camelCase`, types/classes in `PascalCase`, and environment variables in `SCREAMING_SNAKE_CASE`.
 
 ## Definition Of Done
 
