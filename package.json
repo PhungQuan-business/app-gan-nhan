@@ -4,10 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "tsx watch src/server.ts",
+    "dev": "tsx watch ./apps/backend/src/server.ts",
     "test": "vitest run",
     "lint": "exec eslint .",
-    "db:check": "tsx ./scripts/prisma-smoke-test.ts",
+    "db:check": "tsx ./apps/backend/scripts/prisma-smoke-test.ts",
     "db:validate": "prisma validate",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev --name"
@@ -26,29 +26,12 @@
   "type": "module",
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@types/bcryptjs": "^3.0.0",
-    "@types/express": "^5.0.6",
-    "@types/jsonwebtoken": "^9.0.10",
-    "@types/node": "^26.6.5",
-    "dotenv": "^18.0.7",
     "eslint": "^9.39.5",
     "globals": "^17.13.0",
-    "prisma": "^7.10.0",
-    "ts-node": "^10.9.2",
-    "tsconfig-paths": "^4.2.0",
     "tsx": "^4.23.15",
     "typescript": "npm:@typescript/typescript6@^6.0.0",
     "typescript-7": "npm:typescript@^7.0.0",
     "typescript-eslint": "^8.71.2",
     "vitest": "^5.0.5"
-  },
-  "dependencies": {
-    "@prisma/adapter-pg": "^7.10.0",
-    "@prisma/client": "^7.10.0",
-    "bcryptjs": "^3.0.3",
-    "express": "^5.3.0",
-    "jsonwebtoken": "^9.0.3",
-    "nodemailer": "^10.1.0",
-    "pg": "^8.23.1"
   }
 }
