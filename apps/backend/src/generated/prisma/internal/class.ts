@@ -17,8 +17,8 @@ import type * as Prisma from "./prismaNamespace.js"
 
 const config: runtime.GetPrismaClientConfig = {
   "previewFeatures": [],
-  "clientVersion": "7.10.0",
-  "engineVersion": "0edf323efd1d98336f3f0a68684b56f689b900d3",
+  "clientVersion": "7.10.1",
+  "engineVersion": "d1b3f377ca835d73fd50954a5e22128b9ebdd6b8",
   "activeProvider": "postgresql",
   "inlineSchema": "datasource db {\n  provider = \"postgresql\"\n}\n\ngenerator client {\n  provider = \"prisma-client\"\n  output   = \"../src/generated/prisma\"\n}\n\nmodel User {\n  id        Int      @id @default(autoincrement())\n  name      String?\n  email     String   @unique // Made required for standard login\n  password  String // Made required since every user needs a hashed password\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n\nmodel EmailOtp {\n  id        String   @id @default(cuid())\n  email     String   @unique\n  otpHash   String\n  expiresAt DateTime\n  attempts  Int      @default(0)\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  @@map(\"email_otps\")\n}\n\nmodel SignupVerification {\n  id        String   @id @default(cuid())\n  email     String   @unique\n  tokenHash String   @unique\n  expiresAt DateTime\n  createdAt DateTime @default(now())\n\n  @@map(\"signup_verifications\")\n}\n",
   "runtimeDataModel": {

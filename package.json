@@ -4,13 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "tsx watch ./apps/backend/src/server.ts",
+    "dev": "pnpm --filter backend dev",
     "test": "vitest run",
-    "lint": "exec eslint .",
+    "lint_be": "pnpm --filter backend lint .",
+    "lint_fe": "pnpm --filter frontend lint",
     "db:check": "tsx ./apps/backend/scripts/prisma-smoke-test.ts",
-    "db:validate": "prisma validate",
-    "db:generate": "prisma generate",
-    "db:migrate": "prisma migrate dev --name"
+    "db:validate": "pnpm --filter backend db:validate",
+    "db:generate": "pnpm --filter backend db:generate",
+    "db:migrate": "pnpm --filter backend db:migrate"
   },
   "keywords": [],
   "author": "",

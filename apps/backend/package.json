@@ -6,8 +6,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "tsx watch ./src/server.ts",
-    "test": "vitest run",
-    "lint": "exec eslint .",
+    "lint": "eslint .",
     "db:check": "tsx ./scripts/prisma-smoke-test.ts",
     "db:validate": "prisma validate",
     "db:generate": "prisma generate",

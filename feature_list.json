@@ -14,51 +14,31 @@
   },
   "features": [
     {
-      "id": "chat-001",
+      "id": "landing-page",
       "priority": 1,
-      "area": "chat",
-      "title": "Create a new conversation",
-      "user_visible_behavior": "A user can click New Chat and see a fresh empty conversation.",
-      "status": "blocked",
+      "area": "frontend",
+      "title": "Landing page",
+      "user_visible_behavior": "Display a landing page with product introduction, Login, and Get Started buttons. Login navigates to the login page; Get Started navigates to the sign-up page.",
+      "status": "in_progress",
       "verification": [
-        "Open the app.",
-        "Click New Chat.",
-        "Verify a new conversation appears in the sidebar.",
-        "Verify the main panel shows an empty conversation state."
-      ],
-      "evidence": [
-        "Baseline verification via ./init.sh fails in Vitest with 'No test suite found' for the repo's test files.",
-        "The backend server is running successfully on port 3000, confirming project startup works."
-      ],
-      "notes": "Project startup is working, but validation is blocked by the repo's current test configuration. Fix the baseline test runner configuration before starting feature implementation."
-    },
-    {
-      "id": "chat-002",
-      "priority": 2,
-      "area": "chat",
-      "title": "Send a message in the current conversation",
-      "user_visible_behavior": "A user can submit a message and see it appear in the active thread.",
-      "status": "not_started",
-      "verification": [
-        "Open an existing conversation.",
-        "Type a message into the input.",
-        "Submit the message.",
-        "Verify the new message appears in the thread."
+        "Open the app and verify the landing page renders correctly.",
+        "Click Login and verify navigation to the login page.",
+        "Click Get Started and verify navigation to the sign-up page."
       ],
       "evidence": [],
       "notes": ""
     },
     {
-      "id": "chat-003",
-      "priority": 3,
-      "area": "chat",
-      "title": "Persist the active conversation list",
-      "user_visible_behavior": "A user sees previously created conversations after restarting the app.",
+      "id": "login-page",
+      "priority": 2,
+      "area": "frontend",
+      "title": "Login page",
+      "user_visible_behavior": "Display a login box with email and password fields, a Login button, and the text \"Don't have an account? Sign up\" at the bottom. Sign up is an embedded link to the sign-up page.",
       "status": "not_started",
       "verification": [
-        "Create two conversations.",
-        "Restart the app.",
-        "Verify both conversations still appear in the sidebar."
+        "Open the login page and verify all elements render correctly.",
+        "Verify the Sign up link appears at the bottom of the login box.",
+        "Click Sign up and verify navigation to the sign-up page."
       ],
       "evidence": [],
       "notes": ""
