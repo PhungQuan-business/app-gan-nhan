@@ -13,11 +13,11 @@ echo "Project root: $ROOT_DIR"
 
 echo ""
 echo "[1/2] Installing dependencies..."
-./scripts/install.sh
+./apps/backend/scripts/install.sh
 
 echo ""
 echo "[2/2] Verifying baseline..."
-./scripts/verify.sh
+./apps/backend/scripts/verify.sh
 
 echo ""
 echo "Initialization completed successfully."
