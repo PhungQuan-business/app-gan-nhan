@@ -1,6 +1,9 @@
 // server.ts
-import "dotenv/config";
+import dotenv from "dotenv";
 import app from "./app.js";
+
+
+dotenv.config();
 
 const port = Number(process.env.BACKEND_PORT);
 
