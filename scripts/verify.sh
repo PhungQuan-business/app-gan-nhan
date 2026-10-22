@@ -49,7 +49,7 @@ run_check  "Generate Prisma client" \
 run_check "JavaScript/TypeScript unit tests" \
     pnpm -r --if-present run test
 
-Verify the Python project.
+# Verify the Python project.
 run_check "Python tests" \
     uv run --locked pytest
 

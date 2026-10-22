@@ -1,60 +1,98 @@
 # AGENTS.md
 
-Whatever action you can do yourself, please do yourself. This include starting apps and performing verification.
+Do everything you can yourself, including starting apps and running verification.
 
-## Project overview
+## Project
 
+- pnpm monorepo.
+- `apps/backend`: TypeScript 6, Express 5, Prisma 7.
+- `apps/frontend`: Vite 8, TypeScript 6.
+- `docker-compose.yaml`: local database.
+- A Web application for labelling data, building knowledge base and end to end AI model and knoweldge graph lifecycle
 
-## Startup Workflow
+## Startup
 
-Before writing code:
-
-1. Confirm the working directory with `pwd`.
-2. Read `agent-progress.md` for the latest verified state and next step.
-3. Read `feature_list.json` and choose the highest-priority unfinished feature.
-4. Review recent commits with `git log --oneline -5`.
+1. Run `pwd`.
+2. Read `agent-progress.md`.
+3. Read `feature_list.json`. Pick the top unfinished feature.
+4. Run `git log --oneline -5`.
 5. Run `./init.sh`.
-6. Run the required smoke or end-to-end verification before starting new work.
+6. Run smoke or end-to-end checks.
 
-If baseline verification is already failing, fix that first. Do not stack new
-feature work on top of a broken starting state.
+If baseline fails, fix it first.
 
 ## Working Rules
 
-- Work on one feature at a time.
-- Do not mark a feature complete just because code was added.
-- Keep changes within the selected feature scope unless a blocker forces a
-  narrow supporting fix.
-- Do not silently change verification rules during implementation.
-- Prefer durable repo artifacts over chat summaries.
+- One feature at a time.
+- Stay in scope. Narrow fixes only for blockers.
+- Code added does not mean feature done.
+- Never change verification rules silently.
+- Prefer repo artifacts over chat summaries.
+- Artifacts: `feature_list.json` (feature state), `agent-progress.md` (log), `init.sh` (startup), `DESIGN.MD`, `session-handoff.md`(optional).
 
-## Required Artifacts
+## Coding Style
 
-- `feature_list.json`: source of truth for feature state
-- `agent-progress.md`: session log and current verified status
-- `init.sh`: standard startup and verification path
-- `session-handoff.md`: optional compact handoff for larger sessions
+- ESM TypeScript. Explicit types at public boundaries.
+- Run `pnpm lint_fe` for frontend and `pnpm lint_be` for backend. ESLint is the authority.
+- Files: kebab-case with role suffix (`auth.service.ts`).
+- `camelCase` vars and functions, `PascalCase` types and classes, `SCREAMING_SNAKE_CASE` env vars.
 
-## Coding Style & Naming Conventions
+## Backend (`apps/backend`)
 
-Write ESM TypeScript with explicit types at public boundaries. Follow ESLint (`pnpm lint`) as the formatting and correctness authority. Use lowercase kebab-case filenames with role suffixes: `auth.service.ts`, `user.controller.ts`, and `auth.route.ts`. Name functions and variables in `camelCase`, types/classes in `PascalCase`, and environment variables in `SCREAMING_SNAKE_CASE`.
+Layout:
+- `src/app.ts`: app setup, middleware, routes.
+- `src/server.ts`: starts server. No logic.
+- `src/<feature>/`: `.route.ts`, `.controller.ts`, `.service.ts`.
+- `src/utils/`: shared helpers.
+- `src/generated/prisma/`: generated. Never edit.
+- `config/prisma.ts`, `middleware/`, `types/`: outside `src/`.
+- `prisma/schema.prisma`: schema.
+- `scripts/`: install, verify, prisma smoke test.
+- `tests/`: mirrors `src/`. Files end in `.test.ts`.
+- `dist/`: build output. Never edit or commit.
 
-## Definition Of Done
+Rules:
+- New feature: new `src/<feature>/` folder, mount router in `app.ts`, add tests.
+- Route wires paths. Controller validates and responds. Service holds logic and Prisma calls.
+- Controllers never call Prisma.
+- Import Prisma only from `config/prisma.ts`.
+- Protect private routes with `authenticate`.
+- Secrets from env. Never hardcode.
+- Schema changes only in `schema.prisma`. Add a migration each time. Never edit applied ones.
+- Regenerate the Prisma client after schema changes.
 
-A feature is done only when all of the following are true:
+Verify:
+1. `pnpm lint_be`, type check, build.
+2. Tests.
+3. `scripts/verify.sh`.
+4. Prisma smoke test if the DB layer changed.
+5. Start server. Call changed endpoints. Check status and body.
 
-- the target behavior is implemented
-- the required verification actually ran
-- evidence is recorded in `feature_list.json` or `agent-progress.md`
-- the repository remains restartable from the standard startup path
+## Frontend (`apps/frontend`)
 
-## End Of Session
+- Layout: `src/` app code, `public/` static.
+- Small, single-purpose components.
+- API calls in an api layer. No `fetch` in components.
+- Match API types. Do not guess fields.
+- Handle loading, error, and empty states.
+- No secrets in client. Only `VITE_` env vars.
 
-Before ending a session:
+Verify:
+1. `pnpm lint_fe`, type check, `pnpm build`.
+2. Start dev server. Test the flow against the backend.
+3. Check the browser console.
 
-1. Update `agent-progress.md`.
-2. Update `feature_list.json`.
+## Finish
+
+Done when:
+- Behavior is implemented.
+- Required verification ran.
+- Evidence is in `feature_list.json` or `agent-progress.md`.
+- Repo restarts cleanly from `./init.sh`.
+
+Before ending:
+1. Update agent-progress.md.
+2. Update feature_list.json.
 3. Record any unresolved risk or blocker.
 4. Commit with a descriptive message once the work is in a safe state.
-5. Leave the repo clean enough for the next session to run `./init.sh`
-   immediately.
+5. Leave the repo clean enough for the next session to run ./init.sh immediately.
