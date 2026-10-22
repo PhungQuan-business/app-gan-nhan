@@ -1,121 +1,136 @@
 import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
 import './App.css'
 
+type AuthMode = 'signin' | 'signup'
+
 function App() {
-  const [count, setCount] = useState(0)
+  const [authMode, setAuthMode] = useState<AuthMode>('signin')
+  const [email, setEmail] = useState('')
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const trimmedEmail = email.trim()
+
+    if (!trimmedEmail) {
+      return
+    }
+
+    console.info(
+      authMode === 'signin'
+        ? `Continue login for ${trimmedEmail}`
+        : `Continue signup for ${trimmedEmail}`,
+    )
+  }
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <div className="app-shell">
+      <header className="topbar">
+        <div className="brand" aria-label="App brand">
+          <span className="brand-mark">A</span>
+          <span className="brand-text">Auralis</span>
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
+
+        <nav className="nav" aria-label="Main navigation">
+          <a href="#features">Features</a>
+          <a href="#solutions">Solutions</a>
+          <a href="#pricing">Pricing</a>
+        </nav>
+
         <button
           type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
+          className="nav-button"
+          onClick={() => setAuthMode('signin')}
         >
-          Count is {count}
+          Login
         </button>
-      </section>
+      </header>
 
-      <div className="ticks"></div>
+      <main className="landing-page">
+        <section className="hero-copy">
+          <p className="eyebrow">AI DATA LABELING WORKFLOW</p>
+          <h1>Build accurate AI with a streamlined labeling platform.</h1>
+          <p className="subtitle">
+            Create datasets, review annotations, and ship production-ready models
+            from one collaborative workspace built for modern teams.
+          </p>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
+          <div className="cta-row">
+            <button
+              type="button"
+              className="primary-button"
+              onClick={() => setAuthMode('signup')}
+            >
+              Get started
+            </button>
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={() => setAuthMode('signin')}
+            >
+              Login
+            </button>
+          </div>
+
+          <ul className="metric-list" aria-label="Product metrics">
             <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
+              <strong>2.8x</strong>
+              <span>Faster labeling</span>
             </li>
             <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
+              <strong>99.2%</strong>
+              <span>Annotation quality</span>
+            </li>
+            <li>
+              <strong>24/7</strong>
+              <span>Workflow visibility</span>
             </li>
           </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+        </section>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+        <aside className="auth-panel" aria-label="Authentication panel">
+          <div className="auth-tabs" role="tablist" aria-label="Authentication mode">
+            <button
+              type="button"
+              className={authMode === 'signin' ? 'active' : ''}
+              onClick={() => setAuthMode('signin')}
+            >
+              Login
+            </button>
+            <button
+              type="button"
+              className={authMode === 'signup' ? 'active' : ''}
+              onClick={() => setAuthMode('signup')}
+            >
+              Get started
+            </button>
+          </div>
+
+          <form className="auth-form" onSubmit={handleSubmit}>
+            <label htmlFor="email">Work email</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="you@company.com"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+            />
+
+            <button type="submit" className="submit-button">
+              {authMode === 'signin' ? 'Continue to login' : 'Create account'}
+            </button>
+          </form>
+
+          <div className="divider" aria-hidden="true">
+            <span>or continue with</span>
+          </div>
+
+          <button type="button" className="social-button">
+            Continue with Google
+          </button>
+        </aside>
+      </main>
+    </div>
   )
 }
 

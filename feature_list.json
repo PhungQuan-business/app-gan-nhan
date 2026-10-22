@@ -1,6 +1,6 @@
 {
   "project": "app-gan-nhan",
-  "last_updated": "2026-10-20",
+  "last_updated": "2026-10-22",
   "rules": {
     "single_active_feature": true,
     "passing_requires_evidence": true,
@@ -19,14 +19,18 @@
       "area": "frontend",
       "title": "Landing page",
       "user_visible_behavior": "Display a landing page with product introduction, Login, and Get Started buttons. Login navigates to the login page; Get Started navigates to the sign-up page.",
-      "status": "in_progress",
+      "status": "passing",
       "verification": [
         "Open the app and verify the landing page renders correctly.",
         "Click Login and verify navigation to the login page.",
         "Click Get Started and verify navigation to the sign-up page."
       ],
-      "evidence": [],
-      "notes": ""
+      "evidence": [
+        "pnpm --filter frontend lint && pnpm --filter frontend build",
+        "./init.sh",
+        "curl -I http://127.0.0.1:5173"
+      ],
+      "notes": "Landing page implemented with dark premium styling and CTA/auth entry states; verified by build and successful HTTP 200 from the running Vite frontend."
     },
     {
       "id": "login-page",
