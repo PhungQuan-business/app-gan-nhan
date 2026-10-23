@@ -52,6 +52,30 @@
         "Responsive browser check at 390px: no horizontal overflow"
       ],
       "notes": "Login screen UI and sign-up navigation are implemented. Authentication submission is not included in the stated feature behavior."
+    },
+    {
+      "id": "signup-page",
+      "priority": 2,
+      "area": "frontend",
+      "title": "Sign up page",
+      "user_visible_behavior": "Clicking Get Started on the landing page or Sign up on the login page navigates to the sign-up page. Display a sign-up box containing an email field, a Continue button, and the text \"Already have an account? Sign in\" at the bottom. Sign in is an embedded link to the login page.",
+      "status": "passing",
+      "verification": [
+        "Click Get Started on the landing page and verify navigation to the sign-up page.",
+        "Click Sign up on the login page and verify navigation to the sign-up page.",
+        "Verify the sign-up box contains only an email field and a Continue button.",
+        "Verify the text \"Already have an account? Sign in\" appears at the bottom of the box.",
+        "Click Sign in and verify navigation to the login page.",
+        "Verify the page renders correctly at supported viewport sizes."
+      ],
+      "evidence": [
+        "pnpm --filter frontend lint && pnpm --filter frontend build",
+        "Browser verification: Get started navigates to /signup",
+        "Browser verification: /signup contains one email field, no password field, and Continue button",
+        "Browser verification: Sign in navigates to /login",
+        "Responsive browser check at 390px: no horizontal overflow"
+      ],
+      "notes": "Signup page matches the specified email-only entry screen. Continue is present as requested; account creation and OTP steps are outside this feature's specified behavior."
     }
   ]
 }

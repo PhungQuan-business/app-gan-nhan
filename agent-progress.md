@@ -5,8 +5,8 @@
 - Repository root: /home/airc/app-gan-nhan-v2
 - Standard startup path: ./init.sh
 - Standard verification path: ./init.sh (includes lint, Prisma validate/generate, JS/TS tests, and Python tests)
-- Current highest-priority unfinished feature: None. `landing-page` and `login-page` are passing; the next feature should be added to feature_list.json.
-- Current blocker: None. Login form submission/authentication is outside the written login-page behavior, which specifies the screen and sign-up navigation.
+- Current highest-priority unfinished feature: None. `landing-page`, `login-page`, and `signup-page` are passing.
+- Current blocker: None. Signup submission and OTP/account creation are outside the written signup-page behavior, which specifies the email-entry screen and navigation.
 
 ## Session Log
 
@@ -53,7 +53,19 @@
 - Completed: Replaced the login route placeholder with an accessible login panel containing email and password inputs, a Login button, and the required sign-up prompt/link.
 - Verification run: `pnpm --filter frontend lint && pnpm --filter frontend build`; browser checks of `/login`, the Sign up navigation to `/signup`, and a 390px viewport.
 - Evidence captured: Both labeled input fields and the Login button rendered; the exact sign-up prompt appeared at the bottom of the card; Sign up navigated to `/signup`; no horizontal overflow on mobile.
-- Commits: pending
+- Commits: 2010db5 — feat: add login page
 - Files or artifacts updated: apps/frontend/src/App.tsx, apps/frontend/src/App.css, feature_list.json, agent-progress.md
 - Known risk or unresolved issue: Credential submission is not wired to the backend because the feature's specified behavior is limited to the login screen and sign-up navigation.
+- Next best step: add the next requested feature to feature_list.json.
+
+### Session 005
+
+- Date: 2026-10-23
+- Goal: Implement and verify the `signup-page` feature.
+- Completed: Replaced the signup route placeholder with a responsive email-only sign-up panel, Continue button, and the required Sign in prompt/link.
+- Verification run: `pnpm --filter frontend lint && pnpm --filter frontend build`; browser checks for both Get started navigation and the Sign in link, field shape, and 390px responsiveness; repository-wide verification.
+- Evidence captured: `/signup` displayed exactly one email field, no password field, and a Continue button; Sign in navigated to `/login`; Get started navigated to `/signup`; the mobile viewport had no horizontal overflow.
+- Commits: signup-page feature commit created after verification
+- Files or artifacts updated: apps/frontend/src/App.tsx, apps/frontend/src/App.css, feature_list.json, agent-progress.md
+- Known risk or unresolved issue: Continue is a UI affordance only; the feature specification does not include email OTP or account-creation behavior.
 - Next best step: add the next requested feature to feature_list.json.

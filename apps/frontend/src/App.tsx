@@ -13,17 +13,45 @@ function AuthDestination({ mode }: { mode: 'login' | 'signup' }) {
     return <LoginPage />
   }
 
+  return <SignupPage />
+}
+
+function SignupPage() {
+  const [email, setEmail] = useState('')
+
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+  }
+
   return (
     <main className="destination-page">
       <a className="destination-brand" href="/">
         <span className="brand-mark" aria-hidden="true">D</span>
         <span>Distributed Infrastructure Protocol</span>
       </a>
-      <section className="destination-content">
+      <section className="signup-card" aria-labelledby="signup-heading">
         <p className="eyebrow">DISTRIBUTED INFRASTRUCTURE PROTOCOL</p>
-        <h1>Get started</h1>
-        <p>The sign-up experience is coming next.</p>
-        <a className="text-link" href="/">Return to the landing page</a>
+        <h1 id="signup-heading">Create your account</h1>
+        <p className="signup-description">Start with your email address.</p>
+        <form className="signup-form" onSubmit={handleSubmit}>
+          <label htmlFor="signup-email">Email</label>
+          <input
+            id="signup-email"
+            name="email"
+            type="email"
+            autoComplete="email"
+            placeholder="you@example.com"
+            required
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+          />
+          <button className="primary-button signup-submit" type="submit">
+            Continue
+          </button>
+        </form>
+        <p className="signin-prompt">
+          Already have an account? <a href="/login">Sign in</a>
+        </p>
       </section>
     </main>
   )
