@@ -345,6 +345,88 @@
   box-shadow: 0 16px 40px rgba(17, 24, 39, 0.08);
 }
 
+.login-card {
+  width: min(460px, 100%);
+  margin: 12vh auto 0;
+  padding: 40px;
+  border: 1px solid rgba(17, 24, 39, 0.14);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: 0 16px 40px rgba(17, 24, 39, 0.08);
+}
+
+.login-card .eyebrow {
+  margin-bottom: 18px;
+  font-size: 10px;
+}
+
+.login-card h1 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 40px;
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.05em;
+}
+
+.login-description {
+  margin: 10px 0 28px;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.login-form label {
+  margin: 0 0 8px;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.login-form input {
+  width: 100%;
+  min-height: 48px;
+  margin: 0 0 20px;
+  padding: 0 14px;
+  border: 1px solid rgba(17, 24, 39, 0.2);
+  border-radius: var(--radius-control);
+  background: rgba(255, 255, 255, 0.5);
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.login-form input::placeholder {
+  color: rgba(75, 85, 99, 0.7);
+}
+
+.login-form input:focus-visible {
+  outline: 2px solid var(--text-secondary);
+  outline-offset: 2px;
+}
+
+.login-submit {
+  width: 100%;
+  margin-top: 4px;
+  cursor: pointer;
+}
+
+.signup-prompt {
+  margin: 24px 0 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+  text-align: center;
+}
+
+.signup-prompt a {
+  color: var(--text-primary);
+  font-weight: 600;
+  text-underline-offset: 3px;
+}
+
 .destination-content h1 {
   font-size: 48px;
 }
@@ -465,6 +547,11 @@
 
   .destination-content {
     margin-top: 15vh;
+    padding: 32px 24px;
+  }
+
+  .login-card {
+    margin-top: 10vh;
     padding: 32px 24px;
   }
 }

@@ -1,4 +1,5 @@
 import './App.css'
+import { useState } from 'react'
 
 const networkMetrics = [
   { value: '340+', label: 'active edge locations mapped' },
@@ -8,7 +9,9 @@ const networkMetrics = [
 ]
 
 function AuthDestination({ mode }: { mode: 'login' | 'signup' }) {
-  const title = mode === 'login' ? 'Log in' : 'Get started'
+  if (mode === 'login') {
+    return <LoginPage />
+  }
 
   return (
     <main className="destination-page">
@@ -18,13 +21,64 @@ function AuthDestination({ mode }: { mode: 'login' | 'signup' }) {
       </a>
       <section className="destination-content">
         <p className="eyebrow">DISTRIBUTED INFRASTRUCTURE PROTOCOL</p>
-        <h1>{title}</h1>
-        <p>
-          {mode === 'login'
-            ? 'The login experience is coming next.'
-            : 'The sign-up experience is coming next.'}
-        </p>
+        <h1>Get started</h1>
+        <p>The sign-up experience is coming next.</p>
         <a className="text-link" href="/">Return to the landing page</a>
+      </section>
+    </main>
+  )
+}
+
+function LoginPage() {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+  }
+
+  return (
+    <main className="destination-page">
+      <a className="destination-brand" href="/">
+        <span className="brand-mark" aria-hidden="true">D</span>
+        <span>Distributed Infrastructure Protocol</span>
+      </a>
+      <section className="login-card" aria-labelledby="login-heading">
+        <p className="eyebrow">DISTRIBUTED INFRASTRUCTURE PROTOCOL</p>
+        <h1 id="login-heading">Welcome back</h1>
+        <p className="login-description">Log in to your account to continue.</p>
+        <form className="login-form" onSubmit={handleSubmit}>
+          <label htmlFor="login-email">Email</label>
+          <input
+            id="login-email"
+            name="email"
+            type="email"
+            autoComplete="email"
+            placeholder="you@example.com"
+            required
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+          />
+
+          <label htmlFor="login-password">Password</label>
+          <input
+            id="login-password"
+            name="password"
+            type="password"
+            autoComplete="current-password"
+            placeholder="Enter your password"
+            required
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+          />
+
+          <button className="primary-button login-submit" type="submit">
+            Login
+          </button>
+        </form>
+        <p className="signup-prompt">
+          Don&apos;t have an account? <a href="/signup">Sign up</a>
+        </p>
       </section>
     </main>
   )

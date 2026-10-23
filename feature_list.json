@@ -39,14 +39,19 @@
       "area": "frontend",
       "title": "Login page",
       "user_visible_behavior": "Display a login box with email and password fields, a Login button, and the text \"Don't have an account? Sign up\" at the bottom. Sign up is an embedded link to the sign-up page.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Open the login page and verify all elements render correctly.",
         "Verify the Sign up link appears at the bottom of the login box.",
         "Click Sign up and verify navigation to the sign-up page."
       ],
-      "evidence": [],
-      "notes": ""
+      "evidence": [
+        "pnpm --filter frontend lint && pnpm --filter frontend build",
+        "Browser verification: /login renders email and password fields, Login button, and the sign-up prompt",
+        "Browser verification: Sign up navigates to /signup",
+        "Responsive browser check at 390px: no horizontal overflow"
+      ],
+      "notes": "Login screen UI and sign-up navigation are implemented. Authentication submission is not included in the stated feature behavior."
     }
   ]
 }

@@ -5,8 +5,8 @@
 - Repository root: /home/airc/app-gan-nhan-v2
 - Standard startup path: ./init.sh
 - Standard verification path: ./init.sh (includes lint, Prisma validate/generate, JS/TS tests, and Python tests)
-- Current highest-priority unfinished feature: login-page — build the login screen after landing-page is complete
-- Current blocker: None. The sign-in and sign-up destinations are route placeholders; the login form belongs to the next `login-page` feature.
+- Current highest-priority unfinished feature: None. `landing-page` and `login-page` are passing; the next feature should be added to feature_list.json.
+- Current blocker: None. Login form submission/authentication is outside the written login-page behavior, which specifies the screen and sign-up navigation.
 
 ## Session Log
 
@@ -45,3 +45,15 @@
 - Files or artifacts updated: apps/frontend/src/App.tsx, apps/frontend/src/App.css, apps/frontend/src/index.css, feature_list.json, agent-progress.md
 - Known risk or unresolved issue: DESIGN.md refers to an attached HTML source reference that was not present in the workspace; implementation follows the visible written content and design tokens.
 - Next best step: implement the full login page in the `login-page` feature.
+
+### Session 004
+
+- Date: 2026-10-23
+- Goal: Implement and verify the `login-page` feature.
+- Completed: Replaced the login route placeholder with an accessible login panel containing email and password inputs, a Login button, and the required sign-up prompt/link.
+- Verification run: `pnpm --filter frontend lint && pnpm --filter frontend build`; browser checks of `/login`, the Sign up navigation to `/signup`, and a 390px viewport.
+- Evidence captured: Both labeled input fields and the Login button rendered; the exact sign-up prompt appeared at the bottom of the card; Sign up navigated to `/signup`; no horizontal overflow on mobile.
+- Commits: pending
+- Files or artifacts updated: apps/frontend/src/App.tsx, apps/frontend/src/App.css, feature_list.json, agent-progress.md
+- Known risk or unresolved issue: Credential submission is not wired to the backend because the feature's specified behavior is limited to the login screen and sign-up navigation.
+- Next best step: add the next requested feature to feature_list.json.
