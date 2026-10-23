@@ -1,137 +1,115 @@
-import { useState } from 'react'
 import './App.css'
 
-type AuthMode = 'signin' | 'signup'
+const networkMetrics = [
+  { value: '340+', label: 'active edge locations mapped' },
+  { value: '€8.2T', label: 'total verified settling volume' },
+  { value: '99.999%', label: 'system availability SLA' },
+  { value: '1.2B+', label: 'daily compute executions' },
+]
 
-function App() {
-  const [authMode, setAuthMode] = useState<AuthMode>('signin')
-  const [email, setEmail] = useState('')
-
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    const trimmedEmail = email.trim()
-
-    if (!trimmedEmail) {
-      return
-    }
-
-    console.info(
-      authMode === 'signin'
-        ? `Continue login for ${trimmedEmail}`
-        : `Continue signup for ${trimmedEmail}`,
-    )
-  }
+function AuthDestination({ mode }: { mode: 'login' | 'signup' }) {
+  const title = mode === 'login' ? 'Log in' : 'Get started'
 
   return (
-    <div className="app-shell">
+    <main className="destination-page">
+      <a className="destination-brand" href="/">
+        <span className="brand-mark" aria-hidden="true">D</span>
+        <span>Distributed Infrastructure Protocol</span>
+      </a>
+      <section className="destination-content">
+        <p className="eyebrow">DISTRIBUTED INFRASTRUCTURE PROTOCOL</p>
+        <h1>{title}</h1>
+        <p>
+          {mode === 'login'
+            ? 'The login experience is coming next.'
+            : 'The sign-up experience is coming next.'}
+        </p>
+        <a className="text-link" href="/">Return to the landing page</a>
+      </section>
+    </main>
+  )
+}
+
+function LandingPage() {
+  return (
+    <div className="site-shell">
       <header className="topbar">
-        <div className="brand" aria-label="App brand">
-          <span className="brand-mark">A</span>
-          <span className="brand-text">Auralis</span>
-        </div>
+        <a className="brand" href="/" aria-label="Distributed Infrastructure Protocol home">
+          <span className="brand-mark" aria-hidden="true">D</span>
+          <span className="brand-name">DIP<span>.</span></span>
+        </a>
 
         <nav className="nav" aria-label="Main navigation">
-          <a href="#features">Features</a>
-          <a href="#solutions">Solutions</a>
-          <a href="#pricing">Pricing</a>
+          <a href="#network">Network</a>
+          <a href="#metrics">Metrics</a>
+          <a href="#protocol">Protocol</a>
         </nav>
 
-        <button
-          type="button"
-          className="nav-button"
-          onClick={() => setAuthMode('signin')}
-        >
-          Login
-        </button>
+        <div className="header-actions">
+          <a className="login-link" href="/login">Login</a>
+          <a className="primary-button" href="/signup">Get started</a>
+        </div>
       </header>
 
-      <main className="landing-page">
-        <section className="hero-copy">
-          <p className="eyebrow">AI DATA LABELING WORKFLOW</p>
-          <h1>Build accurate AI with a streamlined labeling platform.</h1>
-          <p className="subtitle">
-            Create datasets, review annotations, and ship production-ready models
-            from one collaborative workspace built for modern teams.
-          </p>
-
-          <div className="cta-row">
-            <button
-              type="button"
-              className="primary-button"
-              onClick={() => setAuthMode('signup')}
-            >
-              Get started
-            </button>
-            <button
-              type="button"
-              className="secondary-button"
-              onClick={() => setAuthMode('signin')}
-            >
-              Login
-            </button>
+      <main id="network">
+        <section className="feature-section" aria-labelledby="hero-heading">
+          <div className="hero-copy">
+            <p className="eyebrow">DISTRIBUTED INFRASTRUCTURE PROTOCOL</p>
+            <h1 id="hero-heading">The heartbeat of decentralized scale.</h1>
+            <p className="hero-description">
+              A global network built to move value and compute with precision.
+              See the infrastructure connecting the next generation of digital
+              systems.
+            </p>
+            <div className="hero-actions">
+              <a className="primary-button" href="/signup">Get started</a>
+              <a className="secondary-button" href="/login">Login</a>
+            </div>
           </div>
 
-          <ul className="metric-list" aria-label="Product metrics">
-            <li>
-              <strong>2.8x</strong>
-              <span>Faster labeling</span>
-            </li>
-            <li>
-              <strong>99.2%</strong>
-              <span>Annotation quality</span>
-            </li>
-            <li>
-              <strong>24/7</strong>
-              <span>Workflow visibility</span>
-            </li>
-          </ul>
+          <div className="network-visual" aria-hidden="true">
+            <div className="network-orbit network-orbit-one" />
+            <div className="network-orbit network-orbit-two" />
+            <div className="network-orbit network-orbit-three" />
+            <span className="network-node node-one" />
+            <span className="network-node node-two" />
+            <span className="network-node node-three" />
+            <span className="network-node node-four" />
+            <span className="network-node node-five" />
+            <span className="network-core" />
+          </div>
         </section>
 
-        <aside className="auth-panel" aria-label="Authentication panel">
-          <div className="auth-tabs" role="tablist" aria-label="Authentication mode">
-            <button
-              type="button"
-              className={authMode === 'signin' ? 'active' : ''}
-              onClick={() => setAuthMode('signin')}
-            >
-              Login
-            </button>
-            <button
-              type="button"
-              className={authMode === 'signup' ? 'active' : ''}
-              onClick={() => setAuthMode('signup')}
-            >
-              Get started
-            </button>
-          </div>
+        <section className="metrics-section" id="metrics" aria-label="Network metrics">
+          {networkMetrics.map((metric) => (
+            <article className="metric" key={metric.label}>
+              <p className="metric-value">{metric.value}</p>
+              <p className="metric-label">{metric.label}</p>
+            </article>
+          ))}
+        </section>
 
-          <form className="auth-form" onSubmit={handleSubmit}>
-            <label htmlFor="email">Work email</label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              placeholder="you@company.com"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-            />
-
-            <button type="submit" className="submit-button">
-              {authMode === 'signin' ? 'Continue to login' : 'Create account'}
-            </button>
-          </form>
-
-          <div className="divider" aria-hidden="true">
-            <span>or continue with</span>
-          </div>
-
-          <button type="button" className="social-button">
-            Continue with Google
-          </button>
-        </aside>
+        <footer className="page-footer" id="protocol">
+          <span>Built for a distributed world.</span>
+          <span className="footer-status"><span /> NETWORK OPERATIONAL</span>
+        </footer>
       </main>
     </div>
   )
+}
+
+function App() {
+  const path = window.location.pathname.replace(/\/+$/, '') || '/'
+
+  if (path === '/login') {
+    return <AuthDestination mode="login" />
+  }
+
+  if (path === '/signup') {
+    return <AuthDestination mode="signup" />
+  }
+
+  return <LandingPage />
 }
 
 export default App

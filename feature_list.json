@@ -1,6 +1,6 @@
 {
   "project": "app-gan-nhan",
-  "last_updated": "2026-10-22",
+  "last_updated": "2026-10-23",
   "rules": {
     "single_active_feature": true,
     "passing_requires_evidence": true,
@@ -27,10 +27,11 @@
       ],
       "evidence": [
         "pnpm --filter frontend lint && pnpm --filter frontend build",
-        "./init.sh",
-        "curl -I http://127.0.0.1:5173"
+        "Browser verification: / renders the requested headline and all four metrics",
+        "Browser verification: Login navigates to /login and Get started navigates to /signup",
+        "Responsive browser check at 390px: no horizontal overflow; all four metrics render"
       ],
-      "notes": "Landing page implemented with dark premium styling and CTA/auth entry states; verified by build and successful HTTP 200 from the running Vite frontend."
+      "notes": "Redesigned to the slate palette and full-width infrastructure feature layout in DESIGN.md. The auth destinations are lightweight placeholders for the separate login-page feature."
     },
     {
       "id": "login-page",
