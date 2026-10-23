@@ -76,6 +76,30 @@
         "Responsive browser check at 390px: no horizontal overflow"
       ],
       "notes": "Signup page matches the specified email-only entry screen. Continue is present as requested; account creation and OTP steps are outside this feature's specified behavior."
+    },
+    {
+      "id": "verify-otp-page",
+      "priority": 2,
+      "area": "frontend",
+      "title": "OTP verification page",
+      "user_visible_behavior": "After submitting an email on the sign-up page, the user sees a success message confirming that an OTP has been sent and is redirected to the OTP verification page. The page displays an OTP input field and a Continue button. Invalid or expired OTPs display an error message below the input field. Successful verification redirects the user to the main app page without displaying an error message.",
+      "status": "passing",
+      "verification": [
+        "Enter an email on the sign-up page and click Continue.",
+        "Verify a success message confirms that the OTP has been sent.",
+        "Verify redirection to the OTP verification page.",
+        "Enter an invalid or expired OTP and verify an error message appears below the input field.",
+        "Enter a valid OTP and click Continue.",
+        "Verify successful verification redirects to the main app page without an error message."
+      ],
+      "evidence": [
+        "pnpm --filter frontend lint && pnpm --filter frontend build",
+        "Browser flow verification with mocked auth API: email request shows OTP-sent success message and navigates to /verify-otp",
+        "Browser flow verification: invalid OTP displays the server error below the code field",
+        "Browser flow verification: valid OTP stores signup token and redirects to /",
+        "Responsive browser check at 390px: no horizontal overflow"
+      ],
+      "notes": "Signup OTP request and verification use the existing backend routes through the frontend auth API layer. Success redirects to the existing root page because no separate main-app route currently exists."
     }
   ]
 }

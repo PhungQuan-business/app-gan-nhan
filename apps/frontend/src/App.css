@@ -365,6 +365,117 @@
   box-shadow: 0 16px 40px rgba(17, 24, 39, 0.08);
 }
 
+.otp-card {
+  width: min(460px, 100%);
+  margin: 12vh auto 0;
+  padding: 40px;
+  border: 1px solid rgba(17, 24, 39, 0.14);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: 0 16px 40px rgba(17, 24, 39, 0.08);
+}
+
+.otp-card .eyebrow {
+  margin-bottom: 18px;
+  font-size: 10px;
+}
+
+.otp-card h1 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 40px;
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.05em;
+}
+
+.otp-success {
+  margin: 18px 0 0;
+  padding: 12px 14px;
+  border: 1px solid rgba(17, 24, 39, 0.14);
+  border-radius: var(--radius-control);
+  background: rgba(255, 255, 255, 0.45);
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
+.otp-description {
+  margin: 14px 0 24px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.otp-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.otp-form label {
+  margin: 0 0 8px;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.otp-form input {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid rgba(17, 24, 39, 0.2);
+  border-radius: var(--radius-control);
+  background: rgba(255, 255, 255, 0.5);
+  color: var(--text-primary);
+  font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+  font-size: 18px;
+  letter-spacing: 0.18em;
+}
+
+.otp-form input::placeholder {
+  color: rgba(75, 85, 99, 0.55);
+}
+
+.otp-form input:focus-visible {
+  outline: 2px solid var(--text-secondary);
+  outline-offset: 2px;
+}
+
+.form-error {
+  margin: 0 0 14px;
+  color: #9b1c1c;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.otp-error {
+  margin: 8px 0 0;
+}
+
+.otp-submit {
+  width: 100%;
+  margin-top: 20px;
+  cursor: pointer;
+}
+
+.otp-submit:disabled,
+.signup-submit:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.otp-email-note {
+  margin: 24px 0 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+  text-align: center;
+}
+
+.otp-email-note a {
+  color: var(--text-primary);
+  font-weight: 600;
+  text-underline-offset: 3px;
+}
+
 .signup-card .eyebrow {
   margin-bottom: 18px;
   font-size: 10px;
@@ -638,6 +749,11 @@
   }
 
   .signup-card {
+    margin-top: 10vh;
+    padding: 32px 24px;
+  }
+
+  .otp-card {
     margin-top: 10vh;
     padding: 32px 24px;
   }

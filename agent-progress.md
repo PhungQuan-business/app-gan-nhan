@@ -5,8 +5,8 @@
 - Repository root: /home/airc/app-gan-nhan-v2
 - Standard startup path: ./init.sh
 - Standard verification path: ./init.sh (includes lint, Prisma validate/generate, JS/TS tests, and Python tests)
-- Current highest-priority unfinished feature: None. `landing-page`, `login-page`, and `signup-page` are passing.
-- Current blocker: None. Signup submission and OTP/account creation are outside the written signup-page behavior, which specifies the email-entry screen and navigation.
+- Current highest-priority unfinished feature: None. `landing-page`, `login-page`, `signup-page`, and `verify-otp-page` are passing.
+- Current blocker: None. Successful OTP verification redirects to `/`, the only existing main/root page in the frontend. A distinct authenticated app route does not exist yet.
 
 ## Session Log
 
@@ -69,3 +69,15 @@
 - Files or artifacts updated: apps/frontend/src/App.tsx, apps/frontend/src/App.css, feature_list.json, agent-progress.md
 - Known risk or unresolved issue: Continue is a UI affordance only; the feature specification does not include email OTP or account-creation behavior.
 - Next best step: add the next requested feature to feature_list.json.
+
+### Session 006
+
+- Date: 2026-10-23
+- Goal: Implement and verify the `verify-otp-page` feature.
+- Completed: Wired signup submission to the existing OTP request endpoint, added OTP verification UI and API calls, displayed the sent-code confirmation and invalid/expired errors, retained the signup token for the next signup step, and redirected successful verification to `/`.
+- Verification run: `pnpm --filter frontend lint && pnpm --filter frontend build`; browser flow checks using mocked API responses for request success, invalid OTP, and valid OTP; 390px responsive check; `./scripts/verify.sh`.
+- Evidence captured: Signup request showed the confirmation then routed to `/verify-otp`; invalid code displayed the backend message below the OTP field; valid code redirected to `/` with no alert; signup token was retained; the 390px viewport had no horizontal overflow.
+- Commits: verify-otp-page feature commit created after verification
+- Files or artifacts updated: apps/frontend/src/App.tsx, apps/frontend/src/App.css, apps/frontend/src/api/auth.api.ts, apps/frontend/vite.config.ts, feature_list.json, agent-progress.md
+- Known risk or unresolved issue: Successful verification routes to `/`, currently the landing page, because no distinct main application route exists.
+- Next best step: define/implement the main application route when its feature is specified.

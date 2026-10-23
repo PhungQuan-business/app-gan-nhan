@@ -1,5 +1,6 @@
 import './App.css'
 import { useState } from 'react'
+import { requestSignupOtp, verifySignupOtp } from './api/auth.api'
 
 const networkMetrics = [
   { value: '340+', label: 'active edge locations mapped' },
@@ -18,9 +19,29 @@ function AuthDestination({ mode }: { mode: 'login' | 'signup' }) {
 
 function SignupPage() {
   const [email, setEmail] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    setErrorMessage('')
+    setIsSubmitting(true)
+
+    try {
+      const normalizedEmail = email.trim().toLowerCase()
+      await requestSignupOtp(normalizedEmail)
+      sessionStorage.setItem('signupEmail', normalizedEmail)
+      sessionStorage.setItem(
+        'signupOtpMessage',
+        'A verification code has been sent to your email.',
+      )
+      window.location.assign('/verify-otp')
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error ? error.message : 'Unable to send a verification code.',
+      )
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -43,14 +64,115 @@ function SignupPage() {
             placeholder="you@example.com"
             required
             value={email}
-            onChange={(event) => setEmail(event.target.value)}
+            onChange={(event) => {
+              setEmail(event.target.value)
+              setErrorMessage('')
+            }}
           />
-          <button className="primary-button signup-submit" type="submit">
-            Continue
+          {errorMessage && (
+            <p className="form-error" role="alert">{errorMessage}</p>
+          )}
+          <button
+            className="primary-button signup-submit"
+            type="submit"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Sending…' : 'Continue'}
           </button>
         </form>
         <p className="signin-prompt">
           Already have an account? <a href="/login">Sign in</a>
+        </p>
+      </section>
+    </main>
+  )
+}
+
+function VerifyOtpPage() {
+  const [otp, setOtp] = useState('')
+  const [email] = useState(() => sessionStorage.getItem('signupEmail') ?? '')
+  const [successMessage] = useState(
+    () => sessionStorage.getItem('signupOtpMessage') ?? '',
+  )
+  const [errorMessage, setErrorMessage] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    setErrorMessage('')
+
+    if (!email) {
+      setErrorMessage('Start sign up again to request a new verification code.')
+      return
+    }
+
+    setIsSubmitting(true)
+    try {
+      const result = await verifySignupOtp(email, otp)
+      if (!result.success) {
+        setErrorMessage(result.message)
+        setIsSubmitting(false)
+        return
+      }
+
+      if (result.signupToken) {
+        sessionStorage.setItem('signupToken', result.signupToken)
+      }
+      sessionStorage.removeItem('signupOtpMessage')
+      window.location.assign('/')
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error ? error.message : 'Unable to verify the code.',
+      )
+      setIsSubmitting(false)
+    }
+  }
+
+  return (
+    <main className="destination-page">
+      <a className="destination-brand" href="/">
+        <span className="brand-mark" aria-hidden="true">D</span>
+        <span>Distributed Infrastructure Protocol</span>
+      </a>
+      <section className="otp-card" aria-labelledby="otp-heading">
+        <p className="eyebrow">DISTRIBUTED INFRASTRUCTURE PROTOCOL</p>
+        <h1 id="otp-heading">Verify your email</h1>
+        {successMessage && (
+          <p className="otp-success" role="status">{successMessage}</p>
+        )}
+        <p className="otp-description">
+          Enter the six-digit code sent to {email || 'your email address'}.
+        </p>
+        <form className="otp-form" onSubmit={handleSubmit}>
+          <label htmlFor="signup-otp">Verification code</label>
+          <input
+            id="signup-otp"
+            name="otp"
+            type="text"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            maxLength={6}
+            placeholder="000000"
+            required
+            value={otp}
+            onChange={(event) => {
+              setOtp(event.target.value)
+              setErrorMessage('')
+            }}
+          />
+          {errorMessage && (
+            <p className="form-error otp-error" role="alert">{errorMessage}</p>
+          )}
+          <button
+            className="primary-button otp-submit"
+            type="submit"
+            disabled={isSubmitting || !email}
+          >
+            {isSubmitting ? 'Verifying…' : 'Continue'}
+          </button>
+        </form>
+        <p className="otp-email-note">
+          Didn&apos;t get a code? <a href="/signup">Try another email</a>
         </p>
       </section>
     </main>
@@ -189,6 +311,10 @@ function App() {
 
   if (path === '/signup') {
     return <AuthDestination mode="signup" />
+  }
+
+  if (path === '/verify-otp') {
+    return <VerifyOtpPage />
   }
 
   return <LandingPage />
