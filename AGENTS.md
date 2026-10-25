@@ -70,17 +70,7 @@ Verify:
 
 ## Frontend (`apps/frontend`)
 
-- Layout: `src/` app code, `public/` static.
-- Small, single-purpose components.
-- API calls in an api layer. No `fetch` in components.
-- Match API types. Do not guess fields.
-- Handle loading, error, and empty states.
-- No secrets in client. Only `VITE_` env vars.
-
-Verify:
-1. `pnpm lint_fe`, type check, `pnpm build`.
-2. Start dev server. Test the flow against the backend.
-3. Check the browser console.
+refer to frontend instruction at FRONTEND.md
 
 ## Finish
 
