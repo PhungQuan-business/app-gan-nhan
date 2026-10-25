@@ -281,7 +281,7 @@
   padding: 28px 24px 28px 0;
 }
 
-.metric + .metric {
+.metric+.metric {
   padding-left: 24px;
   border-left: 1px solid rgba(17, 24, 39, 0.15);
 }
@@ -373,6 +373,87 @@
   border-radius: var(--radius-card);
   background: var(--surface);
   box-shadow: 0 16px 40px rgba(17, 24, 39, 0.08);
+}
+
+.account-card {
+  width: min(460px, 100%);
+  margin: 12vh auto 0;
+  padding: 40px;
+  border: 1px solid rgba(17, 24, 39, 0.14);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: 0 16px 40px rgba(17, 24, 39, 0.08);
+}
+
+.account-card .eyebrow {
+  margin-bottom: 18px;
+  font-size: 10px;
+}
+
+.account-card h1 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 40px;
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.05em;
+}
+
+.account-description {
+  margin: 14px 0 24px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.account-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.account-form label {
+  margin: 0 0 8px;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.account-form input {
+  width: 100%;
+  min-height: 48px;
+  margin: 0 0 10px;
+  padding: 0 14px;
+  border: 1px solid rgba(17, 24, 39, 0.2);
+  border-radius: var(--radius-control);
+  background: rgba(255, 255, 255, 0.5);
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.account-form input:focus-visible {
+  outline: 2px solid var(--text-secondary);
+  outline-offset: 2px;
+}
+
+.account-password-hint {
+  margin: 0 0 20px;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.account-form-error {
+  margin-top: 4px;
+}
+
+.account-submit {
+  width: 100%;
+  margin-top: 8px;
+  cursor: pointer;
+}
+
+.account-submit:disabled {
+  cursor: wait;
+  opacity: 0.65;
 }
 
 .otp-card .eyebrow {
@@ -624,7 +705,7 @@
   font-size: 48px;
 }
 
-.destination-content > p:not(.eyebrow) {
+.destination-content>p:not(.eyebrow) {
   margin: 16px 0 24px;
   color: var(--text-secondary);
 }
@@ -710,7 +791,7 @@
     padding: 22px 12px 22px 0;
   }
 
-  .metric + .metric {
+  .metric+.metric {
     padding-left: 16px;
   }
 
@@ -757,9 +838,15 @@
     margin-top: 10vh;
     padding: 32px 24px;
   }
+
+  .account-card {
+    margin-top: 10vh;
+    padding: 32px 24px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {

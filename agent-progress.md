@@ -5,8 +5,8 @@
 - Repository root: /home/airc/app-gan-nhan-v2
 - Standard startup path: ./init.sh
 - Standard verification path: ./init.sh (includes lint, Prisma validate/generate, JS/TS tests, and Python tests)
-- Current highest-priority unfinished feature: None. `landing-page`, `login-page`, `signup-page`, and `verify-otp-page` are passing.
-- Current blocker: None. Successful OTP verification redirects to `/`, the only existing main/root page in the frontend. A distinct authenticated app route does not exist yet.
+- Current highest-priority unfinished feature: None. `landing-page`, `login-page`, `signup-page`, `verify-otp-page`, and `create-account-page` are passing.
+- Current blocker: None. Successful account creation redirects to `/`, the existing root page; a distinct authenticated application route has not been specified yet.
 
 ## Session Log
 
@@ -93,3 +93,15 @@
 - Files or artifacts updated: `apps/frontend/src/app/`, `apps/frontend/src/pages/`, `apps/frontend/src/features/auth/services/auth.api.ts`, `apps/frontend/src/services/api-client.ts`, `apps/frontend/src/main.tsx`, `agent-progress.md`, `feature_list.json`
 - Known risk or unresolved issue: The working tree still contains unrelated user edits in `AGENTS.md`, `DESIGN.md`, and the untracked `FRONTEND.md`; they were left untouched and excluded from the migration commit.
 - Next best step: Continue with the next requested frontend feature.
+
+### Session 008
+
+- Date: 2026-10-25
+- Goal: Implement the `create-account-page` feature.
+- Completed: Added the account-creation page and `/create-account` route; successful OTP verification now saves the signup token and navigates there; added inline validation matching the backend's minimum eight-character password rule and matching-password requirement; connected submission to the existing `/auth/complete-signup` endpoint; successful creation clears signup credentials and redirects to `/`.
+- Verification run: `./init.sh` baseline; `pnpm lint_fe`, `pnpm --filter frontend exec tsc -b`, `pnpm --filter frontend build`, and `./scripts/verify.sh`; browser flows with mocked OTP/signup API responses, including invalid OTP, short password, mismatched passwords, valid signup redirect, and a 390px viewport.
+- Evidence captured: All checks passed; `/verify-otp` navigates to `/create-account` on success; form and validation messages render; mocked successful signup returns to `/`; mobile viewport has no horizontal overflow. Updated and parsed `feature_list.json`.
+- Commits: none
+- Files or artifacts updated: `apps/frontend/src/app/router.tsx`, `apps/frontend/src/features/auth/services/auth.api.ts`, `apps/frontend/src/pages/auth/create-account-page.tsx`, `apps/frontend/src/pages/auth/signup-page.tsx`, `apps/frontend/src/pages/auth/verify-otp-page.tsx`, `apps/frontend/src/App.css`, `feature_list.json`, `agent-progress.md`
+- Known risk or unresolved issue: The main application page is not implemented, so success returns to `/` (the landing page). Account-creation browser verification mocked the API; live database signup was not exercised.
+- Next best step: Implement the main application route when specified, or test account creation against a configured backend/database.
