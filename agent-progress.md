@@ -5,8 +5,8 @@
 - Repository root: /home/airc/app-gan-nhan-v2
 - Standard startup path: ./init.sh
 - Standard verification path: ./init.sh (includes lint, Prisma validate/generate, JS/TS tests, and Python tests)
-- Current highest-priority unfinished feature: None. `landing-page`, `login-page`, `signup-page`, `verify-otp-page`, and `create-account-page` are passing.
-- Current blocker: None. Successful account creation redirects to `/`, the existing root page; a distinct authenticated application route has not been specified yet.
+- Current highest-priority unfinished feature: `verify-otp-page` is marked `review` in `feature_list.json`. `landing-page`, `login-page`, `signup-page`, `create-account-page`, and `connect-requestotp-api` are passing.
+- Current blocker: None. Login and successful account creation now route to the `/app` placeholder; the full authenticated application workspace is not implemented.
 
 ## Session Log
 
@@ -89,7 +89,7 @@
 - Completed: Moved route selection and app composition to `src/app/`; split landing, login, signup, and OTP pages into page modules; moved auth API functions under `src/features/auth/services/`; centralized POST request handling in `src/services/api-client.ts`; updated the entry point and removed the monolithic app and legacy API modules.
 - Verification run: `./init.sh` before migration; `pnpm lint_fe`, `pnpm --filter frontend exec tsc -b`, and `pnpm --filter frontend build` after migration; browser smoke checks at `/`, `/login`, `/signup`, and `/verify-otp`.
 - Evidence captured: Baseline repository verification passed; post-migration frontend lint, TypeScript build, and production build passed; all four routes rendered their expected page content.
-- Commits: none
+- Commits: refactor(frontend): align source structure with guidelines.
 - Files or artifacts updated: `apps/frontend/src/app/`, `apps/frontend/src/pages/`, `apps/frontend/src/features/auth/services/auth.api.ts`, `apps/frontend/src/services/api-client.ts`, `apps/frontend/src/main.tsx`, `agent-progress.md`, `feature_list.json`
 - Known risk or unresolved issue: The working tree still contains unrelated user edits in `AGENTS.md`, `DESIGN.md`, and the untracked `FRONTEND.md`; they were left untouched and excluded from the migration commit.
 - Next best step: Continue with the next requested frontend feature.
@@ -105,3 +105,27 @@
 - Files or artifacts updated: `apps/frontend/src/app/router.tsx`, `apps/frontend/src/features/auth/services/auth.api.ts`, `apps/frontend/src/pages/auth/create-account-page.tsx`, `apps/frontend/src/pages/auth/signup-page.tsx`, `apps/frontend/src/pages/auth/verify-otp-page.tsx`, `apps/frontend/src/App.css`, `feature_list.json`, `agent-progress.md`
 - Known risk or unresolved issue: The main application page is not implemented, so success returns to `/` (the landing page). Account-creation browser verification mocked the API; live database signup was not exercised.
 - Next best step: Implement the main application route when specified, or test account creation against a configured backend/database.
+
+### Session 009
+
+- Date: 2026-10-25
+- Goal: Start and verify `connect-requestotp-api`.
+- Completed: Confirmed the existing sign-up form submits through the shared API client to `/api/v2/auth/request-otp`, normalizes the email, reports backend errors in place, prevents duplicate submissions during loading, and stores the success message before navigating to `/verify-otp`. No additional application-code change was needed.
+- Verification run: `./init.sh`; `pnpm lint_fe`; `pnpm --filter frontend exec tsc -b`; `pnpm --filter frontend build`; `./scripts/verify.sh`; browser tests with mocked 202 success and 409 error responses.
+- Evidence captured: Request URL/method/body verified (`POST /api/v2/auth/request-otp`, normalized email); success navigates and shows OTP confirmation; failure stays on `/signup` and displays server text; pending button reads `Sending…`, is disabled, and blocks a second request. Repository checks passed.
+- Commits: none
+- Files or artifacts updated: `feature_list.json`, `agent-progress.md`
+- Known risk or unresolved issue: Browser API responses were mocked; actual email delivery and configured backend/database were not exercised.
+- Next best step: Continue with the next unfinished feature.
+
+### Session 010
+
+- Date: 2026-10-25
+- Goal: Update `login-page` for real credential submission and successful navigation.
+- Completed: Connected the login form to `/api/v2/auth/login` through the shared auth API client; added typed success response handling, inline failure display, and a pending state; created the placeholder `/app` page showing the signed-in user with logout; account creation now also returns to `/app`.
+- Verification run: `./init.sh`; `pnpm lint_fe`; `pnpm --filter frontend exec tsc -b`; `pnpm --filter frontend build`; `./scripts/verify.sh`; browser checks with mocked success and 401 login responses and at a 390px viewport.
+- Evidence captured: Successful login posts credentials, stores access token/user in session storage, and opens `/app`; placeholder page renders user details; failed login displays the backend message without navigation; Sign up link navigates to `/signup`; no mobile horizontal overflow. All commands passed.
+- Commits: login feature update committed on `feature/landing-page`.
+- Files or artifacts updated: `apps/frontend/src/features/auth/services/auth.api.ts`, `apps/frontend/src/pages/auth/login-page.tsx`, `apps/frontend/src/pages/app-home-page.tsx`, `apps/frontend/src/app/router.tsx`, `apps/frontend/src/pages/auth/create-account-page.tsx`, `apps/frontend/src/App.css`, `feature_list.json`, `agent-progress.md`
+- Known risk or unresolved issue: Authentication browser checks used mocked responses; live credentials/database were not exercised. The editor may temporarily show a stale missing-module diagnostic for `app-home-page.tsx`, though TypeScript build passed.
+- Next best step: Continue with the next requested feature.

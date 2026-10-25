@@ -13,6 +13,17 @@ export type SignupResult = {
     message: string
 }
 
+export type LoginResult = {
+    accessToken: string
+    tokenType: 'Bearer'
+    expiresIn: number
+    user: {
+        id: number
+        name: string | null
+        email: string
+    }
+}
+
 function isJsonObject(value: unknown): value is JsonObject {
     return typeof value === 'object' && value !== null
 }
@@ -26,6 +37,40 @@ export async function requestSignupOtp(email: string): Promise<void> {
                 ? result.message
                 : 'Unable to send a verification code.'
         throw new Error(message)
+    }
+}
+
+export async function login(email: string, password: string): Promise<LoginResult> {
+    const result = await postJson('/auth/login', { email, password })
+
+    if (
+        !isJsonObject(result) ||
+        result.success !== true ||
+        !isJsonObject(result.data) ||
+        typeof result.data.accessToken !== 'string' ||
+        result.data.tokenType !== 'Bearer' ||
+        typeof result.data.expiresIn !== 'number' ||
+        !isJsonObject(result.data.user) ||
+        typeof result.data.user.id !== 'number' ||
+        !(typeof result.data.user.name === 'string' || result.data.user.name === null) ||
+        typeof result.data.user.email !== 'string'
+    ) {
+        const message =
+            isJsonObject(result) && typeof result.message === 'string'
+                ? result.message
+                : 'The server returned an invalid login response.'
+        throw new Error(message)
+    }
+
+    return {
+        accessToken: result.data.accessToken,
+        tokenType: 'Bearer',
+        expiresIn: result.data.expiresIn,
+        user: {
+            id: result.data.user.id,
+            name: result.data.user.name,
+            email: result.data.user.email,
+        },
     }
 }
 

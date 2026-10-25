@@ -36,7 +36,7 @@ export function CreateAccountPage() {
             await completeSignup(email, password, signupToken)
             sessionStorage.removeItem('signupToken')
             sessionStorage.removeItem('signupEmail')
-            window.location.assign('/')
+            window.location.assign('/app')
         } catch (error) {
             setErrorMessage(
                 error instanceof Error ? error.message : 'Unable to create your account.',

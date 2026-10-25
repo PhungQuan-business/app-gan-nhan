@@ -688,6 +688,48 @@
   cursor: pointer;
 }
 
+.login-submit:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.app-home-card {
+  width: min(720px, 100%);
+  margin: 12vh auto 0;
+  padding: 48px;
+  border: 1px solid rgba(17, 24, 39, 0.14);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: 0 16px 40px rgba(17, 24, 39, 0.08);
+}
+
+.app-home-card h1 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: clamp(40px, 7vw, 64px);
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -0.05em;
+}
+
+.app-home-description {
+  margin: 20px 0 0;
+  color: var(--text-primary);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.app-home-placeholder {
+  margin: 10px 0 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.app-home-logout {
+  margin-top: 28px;
+  cursor: pointer;
+}
+
 .signup-prompt {
   margin: 24px 0 0;
   color: var(--text-secondary);
@@ -840,6 +882,11 @@
   }
 
   .account-card {
+    margin-top: 10vh;
+    padding: 32px 24px;
+  }
+
+  .app-home-card {
     margin-top: 10vh;
     padding: 32px 24px;
   }

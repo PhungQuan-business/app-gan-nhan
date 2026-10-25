@@ -1,11 +1,26 @@
-import { useState, type FormEvent } from 'react'
+import { useState, type SubmitEvent } from 'react'
+import { login } from '../../features/auth/services/auth.api'
 
 export function LoginPage() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [errorMessage, setErrorMessage] = useState('')
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
-    function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    async function handleSubmit(event: SubmitEvent) {
         event.preventDefault()
+        setErrorMessage('')
+        setIsSubmitting(true)
+
+        try {
+            const result = await login(email.trim().toLowerCase(), password)
+            sessionStorage.setItem('accessToken', result.accessToken)
+            sessionStorage.setItem('authUser', JSON.stringify(result.user))
+            window.location.assign('/app')
+        } catch (error) {
+            setErrorMessage(error instanceof Error ? error.message : 'Unable to log in.')
+            setIsSubmitting(false)
+        }
     }
 
     return (
@@ -43,8 +58,11 @@ export function LoginPage() {
                         onChange={(event) => setPassword(event.target.value)}
                     />
 
-                    <button className="primary-button login-submit" type="submit">
-                        Login
+                    {errorMessage && (
+                        <p className="form-error" role="alert">{errorMessage}</p>
+                    )}
+                    <button className="primary-button login-submit" type="submit" disabled={isSubmitting}>
+                        {isSubmitting ? 'Logging in…' : 'Login'}
                     </button>
                 </form>
                 <p className="signup-prompt">
