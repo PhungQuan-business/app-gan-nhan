@@ -17,7 +17,7 @@
 - Completed: Ran ./init.sh successfully through dependency installation; started the Postgres container and launched the backend with `pnpm dev`; confirmed the server responds on port 3000.
 - Verification run: `./init.sh` and `curl -I http://localhost:3000`
 - Evidence captured: `./init.sh` completed install + lint + Prisma validate + Prisma generate; server returned HTTP 404 at localhost:3000, confirming the app is up and responding.
-- Commits: none
+- Commits: refactor(frontend): align source structure with guidelines
 - Files or artifacts updated: agent-progress.md, feature_list.json
 - Known risk or unresolved issue: Baseline pytest failed because no Python tests existed; this was not a code bug but a repo verification gap.
 - Next best step: fix the verification baseline and then implement the landing page.
@@ -81,3 +81,15 @@
 - Files or artifacts updated: apps/frontend/src/App.tsx, apps/frontend/src/App.css, apps/frontend/src/api/auth.api.ts, apps/frontend/vite.config.ts, feature_list.json, agent-progress.md
 - Known risk or unresolved issue: Successful verification routes to `/`, currently the landing page, because no distinct main application route exists.
 - Next best step: define/implement the main application route when its feature is specified.
+
+### Session 007
+
+- Date: 2026-10-25
+- Goal: Migrate the existing frontend code to the structure defined in `FRONTEND.md`.
+- Completed: Moved route selection and app composition to `src/app/`; split landing, login, signup, and OTP pages into page modules; moved auth API functions under `src/features/auth/services/`; centralized POST request handling in `src/services/api-client.ts`; updated the entry point and removed the monolithic app and legacy API modules.
+- Verification run: `./init.sh` before migration; `pnpm lint_fe`, `pnpm --filter frontend exec tsc -b`, and `pnpm --filter frontend build` after migration; browser smoke checks at `/`, `/login`, `/signup`, and `/verify-otp`.
+- Evidence captured: Baseline repository verification passed; post-migration frontend lint, TypeScript build, and production build passed; all four routes rendered their expected page content.
+- Commits: none
+- Files or artifacts updated: `apps/frontend/src/app/`, `apps/frontend/src/pages/`, `apps/frontend/src/features/auth/services/auth.api.ts`, `apps/frontend/src/services/api-client.ts`, `apps/frontend/src/main.tsx`, `agent-progress.md`, `feature_list.json`
+- Known risk or unresolved issue: The working tree still contains unrelated user edits in `AGENTS.md`, `DESIGN.md`, and the untracked `FRONTEND.md`; they were left untouched and excluded from the migration commit.
+- Next best step: Continue with the next requested frontend feature.
