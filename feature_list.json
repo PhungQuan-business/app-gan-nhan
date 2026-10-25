@@ -1,6 +1,6 @@
 {
   "project": "app-gan-nhan",
-  "last_updated": "2026-10-20",
+  "last_updated": "2026-10-25",
   "rules": {
     "single_active_feature": true,
     "passing_requires_evidence": true,
@@ -10,58 +10,152 @@
     "not_started": "Work has not begun.",
     "in_progress": "The feature is the current active task.",
     "blocked": "Work cannot continue until a documented blocker is resolved.",
-    "passing": "Required verification has passed and evidence is recorded."
+    "passing": "Required verification has passed and evidence is recorded.",
+    "update": "Requried modification"
   },
   "features": [
     {
-      "id": "chat-001",
+      "id": "landing-page",
       "priority": 1,
-      "area": "chat",
-      "title": "Create a new conversation",
-      "user_visible_behavior": "A user can click New Chat and see a fresh empty conversation.",
-      "status": "blocked",
+      "area": "frontend",
+      "title": "Landing page",
+      "user_visible_behavior": "Display a landing page with product introduction, Login, and Get Started buttons. Login navigates to the login page; Get Started navigates to the sign-up page.",
+      "status": "passing",
       "verification": [
-        "Open the app.",
-        "Click New Chat.",
-        "Verify a new conversation appears in the sidebar.",
-        "Verify the main panel shows an empty conversation state."
+        "Open the app and verify the landing page renders correctly.",
+        "Click Login and verify navigation to the login page.",
+        "Click Get Started and verify navigation to the sign-up page."
       ],
       "evidence": [
-        "Baseline verification via ./init.sh fails in Vitest with 'No test suite found' for the repo's test files.",
-        "The backend server is running successfully on port 3000, confirming project startup works."
+        "pnpm --filter frontend lint && pnpm --filter frontend build",
+        "Browser verification: / renders the requested headline and all four metrics",
+        "Browser verification: Login navigates to /login and Get started navigates to /signup",
+        "Responsive browser check at 390px: no horizontal overflow; all four metrics render"
       ],
-      "notes": "Project startup is working, but validation is blocked by the repo's current test configuration. Fix the baseline test runner configuration before starting feature implementation."
+      "notes": "Redesigned to the slate palette and full-width infrastructure feature layout in DESIGN.md. The auth destinations are lightweight placeholders for the separate login-page feature."
     },
     {
-      "id": "chat-002",
+      "id": "login-page",
       "priority": 2,
-      "area": "chat",
-      "title": "Send a message in the current conversation",
-      "user_visible_behavior": "A user can submit a message and see it appear in the active thread.",
-      "status": "not_started",
+      "area": "frontend",
+      "title": "Login page",
+      "user_visible_behavior": "Display a login box with email and password fields, a Login button, and the text \"Don't have an account? Sign up\" at the bottom. Sign up is an embedded link to the sign-up page. Existing users can log in with valid credentials and are redirected to a placeholder main app page. Incorrect credentials display an error message.",
+      "status": "passing",
       "verification": [
-        "Open an existing conversation.",
-        "Type a message into the input.",
-        "Submit the message.",
-        "Verify the new message appears in the thread."
+        "Open the login page and verify all elements render correctly.",
+        "Verify the Sign up link appears at the bottom of the login box and navigates to /signup.",
+        "Enter valid credentials and verify successful login redirects to the placeholder main app page, not the landing page.",
+        "Verify the placeholder main app page renders correctly.",
+        "Enter incorrect credentials and verify an error message is displayed without redirecting.",
+        "Verify the page remains responsive at supported viewport sizes."
       ],
-      "evidence": [],
-      "notes": ""
+      "evidence": [
+        "pnpm --filter frontend lint && pnpm --filter frontend build",
+        "Browser verification: /login renders email and password fields, Login button, and the sign-up prompt",
+        "Browser verification: Sign up navigates to /signup",
+        "Browser verification with mocked login API: POST /api/v2/auth/login stores access token and user, then redirects to /app",
+        "Browser verification with mocked 401 response: server error is shown and the user remains on /login",
+        "Browser verification: /app renders placeholder workspace and signed-in user; 390px viewport has no horizontal overflow",
+        "pnpm lint_fe && pnpm --filter frontend exec tsc -b && pnpm --filter frontend build",
+        "./scripts/verify.sh passed"
+      ],
+      "notes": "Login uses the existing backend auth endpoint; successful authentication details are kept in session storage and the user is redirected to the placeholder /app route. The browser API responses were mocked; live database authentication was not exercised."
     },
     {
-      "id": "chat-003",
-      "priority": 3,
-      "area": "chat",
-      "title": "Persist the active conversation list",
-      "user_visible_behavior": "A user sees previously created conversations after restarting the app.",
-      "status": "not_started",
+      "id": "signup-page",
+      "priority": 2,
+      "area": "frontend",
+      "title": "Sign up page",
+      "user_visible_behavior": "Clicking Get Started on the landing page or Sign up on the login page navigates to the sign-up page. Display a sign-up box containing an email field, a Continue button, and the text \"Already have an account? Sign in\" at the bottom. Sign in is an embedded link to the login page.",
+      "status": "passing",
       "verification": [
-        "Create two conversations.",
-        "Restart the app.",
-        "Verify both conversations still appear in the sidebar."
+        "Click Get Started on the landing page and verify navigation to the sign-up page.",
+        "Click Sign up on the login page and verify navigation to the sign-up page.",
+        "Verify the sign-up box contains only an email field and a Continue button.",
+        "Verify the text \"Already have an account? Sign in\" appears at the bottom of the box.",
+        "Click Sign in and verify navigation to the login page.",
+        "Verify the page renders correctly at supported viewport sizes."
       ],
-      "evidence": [],
-      "notes": ""
+      "evidence": [
+        "pnpm --filter frontend lint && pnpm --filter frontend build",
+        "Browser verification: Get started navigates to /signup",
+        "Browser verification: /signup contains one email field, no password field, and Continue button",
+        "Browser verification: Sign in navigates to /login",
+        "Responsive browser check at 390px: no horizontal overflow"
+      ],
+      "notes": "Signup page matches the specified email-only entry screen. Continue is wired to request an OTP and proceed to verification."
+    },
+    {
+      "id": "verify-otp-page",
+      "priority": 2,
+      "area": "frontend",
+      "title": "OTP verification page",
+      "user_visible_behavior": "After submitting an email on the sign-up page, the user sees a success message confirming that an OTP has been sent and is redirected to the OTP verification page. The page displays an OTP input field and a Continue button. Invalid or expired OTPs display an error message below the input field. Successful verification redirects the user to the account creation page without displaying an error message.",
+      "status": "review",
+      "verification": [
+        "Enter an email on the sign-up page and click Continue.",
+        "Verify a success message confirms that the OTP has been sent.",
+        "Verify redirection to the OTP verification page.",
+        "Enter an invalid or expired OTP and verify an error message appears below the input field.",
+        "Enter a valid OTP and click Continue.",
+        "Verify successful verification redirects to the account creation page without displaying an error message."
+      ],
+      "evidence": [
+        "pnpm --filter frontend lint && pnpm --filter frontend build",
+        "Browser flow verification with mocked auth API: email request shows OTP-sent success message and navigates to /verify-otp",
+        "Browser flow verification: invalid OTP displays the server error below the code field",
+        "Browser flow verification: valid OTP stores signup token and redirects to /create-account",
+        "Responsive browser check at 390px: no horizontal overflow"
+      ],
+      "notes": "Signup OTP request and verification use the backend auth routes. Successful verification stores the signup token and proceeds to the create-account page."
+    },
+    {
+      "id": "create-account-page",
+      "priority": 2,
+      "area": "frontend",
+      "title": "Create account page",
+      "user_visible_behavior": "After successful OTP verification, the user is redirected to the account creation page. Display password and confirm password fields and a Create Account button. Show validation messages when the password does not meet the required criteria or the passwords do not match. Upon successful account creation, redirect the user to the main app page.",
+      "status": "passing",
+      "verification": [
+        "Verify successful OTP verification redirects to the account creation page.",
+        "Verify the page displays password and confirm password fields and a Create Account button.",
+        "Enter a password that does not meet the required criteria and verify a validation message appears.",
+        "Enter mismatched passwords and verify a validation message appears.",
+        "Enter a valid, matching password and submit the form.",
+        "Verify successful account creation redirects to the main app page."
+      ],
+      "evidence": [
+        "pnpm lint_fe && pnpm --filter frontend exec tsc -b && pnpm --filter frontend build",
+        "Browser flow verification: successful OTP verification stores signup token and opens /create-account",
+        "Browser verification: /create-account displays password and confirm password fields and Create Account button",
+        "Browser verification: passwords shorter than 8 characters show the backend-aligned password policy message",
+        "Browser verification: mismatched passwords show an inline validation message",
+        "Browser flow verification with mocked complete-signup response: valid matching password submits successfully and redirects to /app"
+      ],
+      "notes": "The UI enforces the backend password policy of at least 8 characters, matching passwords, and submits the verified email and signup token to the existing complete-signup endpoint."
+    },
+    {
+      "id": "connect-requestotp-api",
+      "priority": 1,
+      "area": "frontend",
+      "title": "Connect FE request OTP API to BE",
+      "user_visible_behavior": "When the user submits an email on the sign-up page, the frontend calls the backend request OTP API. Display a success message and navigate to the OTP verification page when successful. Display an error message if the request fails.",
+      "status": "passing",
+      "verification": [
+        "Submit a valid email and verify the frontend sends the request to the correct backend endpoint.",
+        "Verify a successful API response displays a success message and navigates to the OTP verification page.",
+        "Verify API errors are displayed to the user without navigating away.",
+        "Verify the submit button indicates loading and prevents duplicate submissions while the request is pending."
+      ],
+      "evidence": [
+        "pnpm lint_fe && pnpm --filter frontend exec tsc -b && pnpm --filter frontend build",
+        "./scripts/verify.sh passed, including lint, Prisma validation/generation, TypeScript tests, and Python tests",
+        "Browser verification: POST request targets /api/v2/auth/request-otp with normalized email in the request body",
+        "Browser verification: successful request navigates to /verify-otp and displays the OTP-sent status message",
+        "Browser verification: API 409 message is displayed on /signup without navigation",
+        "Browser verification: submit button shows Sending… and is disabled while the request is pending; a second submit is prevented"
+      ],
+      "notes": "The sign-up page uses the shared API client and existing backend contract. The API flow was verified with mocked success and error responses; live OTP delivery was not exercised."
     }
   ]
 }
