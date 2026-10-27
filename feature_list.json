@@ -156,6 +156,31 @@
         "Browser verification: submit button shows Sending… and is disabled while the request is pending; a second submit is prevented"
       ],
       "notes": "The sign-up page uses the shared API client and existing backend contract. The API flow was verified with mocked success and error responses; live OTP delivery was not exercised."
+    },
+    {
+      "id": "main-app-menu",
+      "priority": 1,
+      "area": "frontend",
+      "title": "Main App Menu",
+      "user_visible_behavior": "Display the main application workspace after the user enters the application. Provide a persistent application layout with a left navigation sidebar, a project context area, a central content area, and support for contextual sidebars. The left sidebar contains project information and grouped navigation for Data, Models, and Deploy. Highlight the active navigation item and provide placeholder destinations for menu items whose pages have not been implemented. The central content area displays the currently selected page, initially Upload Data.",
+      "status": "passing",
+      "verification": [
+        "User after login, enter the application and the main application layout renders correctly.",
+        "Verify that the left sidebar displays the project context and navigation groups.",
+        "Verify that the central content area renders the Upload Data page.",
+        "Verify that the active navigation item is visually distinguished.",
+        "Verify that navigation items without implemented pages lead to appropriate placeholder pages.",
+        "Navigate between implemented pages and verify that the shared application shell remains consistent."
+      ],
+      "evidence": [
+        "./init.sh passed before implementation",
+        "pnpm lint_fe && pnpm --filter frontend exec tsc -b && pnpm --filter frontend build passed",
+        "./scripts/verify.sh passed after implementation",
+        "Browser verification: /app opens Upload Data with project context, grouped Data/Models/Deploy navigation, active-state semantics, and upload guidance sidebar",
+        "Browser verification: Training and Endpoints placeholder destinations render while preserving the workspace navigation; selected links expose aria-current=\"page\"",
+        "Responsive browser check at 390px: no horizontal overflow"
+      ],
+      "notes": "Upload Data is the initial implemented destination; other menu items render placeholder pages. File selection is local only and is not connected to an upload API."
     }
   ]
 }

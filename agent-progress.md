@@ -129,3 +129,15 @@
 - Files or artifacts updated: `apps/frontend/src/features/auth/services/auth.api.ts`, `apps/frontend/src/pages/auth/login-page.tsx`, `apps/frontend/src/pages/app-home-page.tsx`, `apps/frontend/src/app/router.tsx`, `apps/frontend/src/pages/auth/create-account-page.tsx`, `apps/frontend/src/App.css`, `feature_list.json`, `agent-progress.md`
 - Known risk or unresolved issue: Authentication browser checks used mocked responses; live credentials/database were not exercised. The editor may temporarily show a stale missing-module diagnostic for `app-home-page.tsx`, though TypeScript build passed.
 - Next best step: Continue with the next requested feature.
+
+### Session 011
+
+- Date: 2026-10-27
+- Goal: Implement and verify the `main-app-menu` feature.
+- Completed: Replaced the `/app` placeholder with a shared project workspace shell, project context, grouped Data/Models/Deploy navigation, active-state indication, the Upload Data page with contextual guidance, and placeholder destinations for unfinished menu pages. Preserved signed-in user display and logout.
+- Verification run: `./init.sh` baseline; `pnpm lint_fe && pnpm --filter frontend exec tsc -b && pnpm --filter frontend build`; `./scripts/verify.sh`; browser navigation checks for initial Upload Data, Training and Endpoints destinations, active navigation, and a 390px viewport.
+- Evidence captured: Baseline and post-change verification passed; browser checks confirmed the shared shell persists across destinations, active links expose `aria-current="page"`, and the 390px layout has no horizontal overflow.
+- Commits: `feat(frontend): add main app workspace menu`
+- Files or artifacts updated: `apps/frontend/src/pages/app-home-page.tsx`, `apps/frontend/src/App.css`, `feature_list.json`, `agent-progress.md`
+- Known risk or unresolved issue: Upload Data currently selects files locally only; no upload endpoint is connected. Other navigation destinations are placeholders.
+- Next best step: Implement the data upload workflow and replace the placeholder destinations as their features are specified.
