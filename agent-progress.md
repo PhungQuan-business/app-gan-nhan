@@ -141,3 +141,15 @@
 - Files or artifacts updated: `apps/frontend/src/pages/app-home-page.tsx`, `apps/frontend/src/App.css`, `feature_list.json`, `agent-progress.md`
 - Known risk or unresolved issue: Upload Data currently selects files locally only; no upload endpoint is connected. Other navigation destinations are placeholders.
 - Next best step: Implement the data upload workflow and replace the placeholder destinations as their features are specified.
+
+### Session 012
+
+- Date: 2026-10-29
+- Goal: Implement and verify the `process-upload-folder` feature end to end.
+- Completed: Added browser folder-relative and ZIP multipart uploads, temporary backend reconstruction/extraction, Roboflow YAML and filename processing, image/annotation association, duplicate/malformed validation, frontend progress and structured result states, and the 15 GB upload limit. Cleaned and finalized the integration processing test.
+- Verification run: `pnpm --filter backend test`; `pnpm lint_be`; backend TypeScript check; `pnpm lint_fe`, frontend TypeScript build, and frontend production build; `./init.sh`; live backend ZIP multipart smoke upload.
+- Evidence captured: Backend tests passed with 16 tests; backend and frontend lint passed; backend TypeScript check passed; frontend type and production builds passed; repository verification passed; the live ZIP upload returned HTTP 202 and structured split, patient/date/angle, collection-session, and annotation metadata.
+- Commits: `819c048` — `feat: process uploaded YOLO datasets`.
+- Files or artifacts updated: `apps/backend/src/data/`, `apps/backend/tests/data/yolo-dataset.service.test.ts`, `apps/frontend/src/features/data/services/data.api.ts`, `apps/frontend/src/pages/app-home-page.tsx`, `apps/frontend/src/App.css`, `feature_list.json`, `agent-progress.md`, package manifests and lockfile.
+- Known risk or unresolved issue: Browser-specific folder transport and malformed archive edge cases should receive manual browser coverage; live database persistence, model training, and client files over a true network boundary remain outside this feature's scope.
+- Next best step: Keep the verified upload workflow as the baseline and continue with subsequent data-management features.

@@ -1,4 +1,5 @@
 import { useRef, useState, type ChangeEvent } from 'react'
+import { uploadDataset, type DatasetUploadResult } from '../features/data/services/data.api'
 
 type AuthUser = {
     name: string | null
@@ -51,11 +52,31 @@ function getSelectedPage(): AppPage {
 }
 
 function UploadDataPage() {
-    const fileInputRef = useRef<HTMLInputElement>(null)
+    const zipInputRef = useRef<HTMLInputElement>(null)
+    const folderInputRef = useRef<HTMLInputElement>(null)
     const [selectedFiles, setSelectedFiles] = useState<File[]>([])
+    const [uploading, setUploading] = useState(false)
+    const [result, setResult] = useState<DatasetUploadResult | null>(null)
+    const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
     function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
         setSelectedFiles(Array.from(event.currentTarget.files ?? []))
+        setResult(null)
+        setErrorMessage(null)
+    }
+
+    async function handleUpload() {
+        if (!selectedFiles.length || uploading) return
+        setUploading(true)
+        setResult(null)
+        setErrorMessage(null)
+        try {
+            setResult(await uploadDataset(selectedFiles))
+        } catch (error) {
+            setErrorMessage(error instanceof Error ? error.message : 'The dataset could not be uploaded.')
+        } finally {
+            setUploading(false)
+        }
     }
 
     return (
@@ -63,31 +84,49 @@ function UploadDataPage() {
             <section className="workspace-intro" aria-labelledby="workspace-page-title">
                 <p className="workspace-eyebrow">DATA / INGESTION</p>
                 <h1 id="workspace-page-title">Upload Data</h1>
-                <p>Bring your source files into this project to prepare them for labeling and model training.</p>
+                <p>Upload a Roboflow YOLO export as a ZIP archive or select the dataset folder from this computer.</p>
             </section>
 
             <section className="upload-panel" aria-label="Select data files">
                 <div className="upload-symbol" aria-hidden="true">↑</div>
                 <h2>Select files to get started</h2>
-                <p>Choose the data files you want to add to this project.</p>
+                <p>Choose a dataset ZIP or folder containing data.yaml and exported images.</p>
+                <input ref={zipInputRef} type="file" accept=".zip,application/zip" hidden onChange={handleFileChange} />
                 <input
-                    ref={fileInputRef}
+                    ref={folderInputRef}
                     type="file"
-                    accept=".csv,.jsonl,.json,.parquet,.txt"
                     multiple
                     hidden
+                    {...({ webkitdirectory: '', directory: '' } as Record<string, string>)}
                     onChange={handleFileChange}
                 />
-                <button className="workspace-primary-button" type="button" onClick={() => fileInputRef.current?.click()}>
-                    Browse files
-                </button>
-                <span className="upload-supported-types">CSV, JSONL, JSON, Parquet, or TXT</span>
+                <div className="upload-actions">
+                    <button className="workspace-primary-button" type="button" onClick={() => zipInputRef.current?.click()}>
+                        Choose ZIP
+                    </button>
+                    <button className="secondary-button workspace-folder-button" type="button" onClick={() => folderInputRef.current?.click()}>
+                        Choose folder
+                    </button>
+                </div>
+                <span className="upload-supported-types">Maximum upload size: 15 GB</span>
                 {selectedFiles.length > 0 && (
                     <p className="selected-files" role="status">
-                        {selectedFiles.length === 1
-                            ? `${selectedFiles[0].name} selected`
-                            : `${selectedFiles.length} files selected`}
+                        {selectedFiles.length === 1 ? `${selectedFiles[0].name} selected` : `${selectedFiles.length} files selected`}
                     </p>
+                )}
+                {selectedFiles.length > 0 && (
+                    <button className="workspace-primary-button upload-submit" type="button" disabled={uploading} onClick={handleUpload}>
+                        {uploading ? 'Uploading…' : 'Process dataset'}
+                    </button>
+                )}
+                {errorMessage && <p className="upload-error" role="alert">{errorMessage}</p>}
+                {result && (
+                    <div className="upload-result" role="status">
+                        <strong>{result.errors.length ? 'Dataset needs attention' : 'Dataset processed successfully'}</strong>
+                        <span>{result.images.length} images across {result.splits.length} splits</span>
+                        {result.errors.map((item) => <span className="upload-result-error" key={`${item.code}-${item.path ?? item.message}`}>{item.message}</span>)}
+                        {result.warnings.map((item) => <span key={`${item.code}-${item.path ?? item.message}`}>{item.message}</span>)}
+                    </div>
                 )}
             </section>
         </>

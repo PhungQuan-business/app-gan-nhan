@@ -1033,10 +1033,63 @@
   outline-offset: 2px;
 }
 
+.upload-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.upload-actions .workspace-primary-button {
+  margin-top: 0;
+}
+
+.workspace-folder-button {
+  min-height: 40px;
+  padding: 0 17px;
+  font-size: 12px;
+}
+
+.upload-submit {
+  margin-top: 18px;
+}
+
+.upload-submit:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
 .upload-supported-types {
   margin-top: 12px;
   color: var(--text-secondary);
   font-size: 10px;
+}
+
+.upload-error {
+  max-width: 520px;
+  margin: 14px 0 0 !important;
+  color: #8a2d2d !important;
+  font-weight: 550;
+}
+
+.upload-result {
+  width: min(520px, 100%);
+  display: grid;
+  gap: 7px;
+  margin-top: 18px;
+  padding: 14px;
+  border: 1px solid rgba(17, 24, 39, 0.14);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.32);
+  font-size: 11px;
+  text-align: left;
+}
+
+.upload-result strong {
+  font-size: 12px;
+}
+
+.upload-result-error {
+  color: #8a2d2d;
 }
 
 .upload-panel .selected-files {

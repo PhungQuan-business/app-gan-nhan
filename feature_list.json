@@ -181,6 +181,42 @@
         "Responsive browser check at 390px: no horizontal overflow"
       ],
       "notes": "Upload Data is the initial implemented destination; other menu items render placeholder pages. File selection is local only and is not connected to an upload API."
+    },
+    {
+      "id": "process-upload-folder",
+      "priority": 1,
+      "area": "backend",
+      "title": "Process uploaded YOLO dataset folder",
+      "user_visible_behavior": "Allow users to upload a Roboflow-exported YOLO dataset folder from their own computers through the frontend. The backend must receive and process the uploaded files through the application's upload API without relying on a pre-existing dataset directory on the server's filesystem. Validate the uploaded folder structure, read data.yaml to identify dataset configuration and class definitions, and parse image filenames to extract the patient profile name, collection date, and image angle. For example, 'Patient_0001_28-10-2025_Top-left_JPG.rf.75fbf8fea405a4f60b0633e71094cb3c.jpg' identifies patient profile 'Patient_0001', collection date '28-10-2025', and image angle 'Top-left'. Support the expected YOLO dataset structure and associate each image with its corresponding annotation when annotations are present. Return structured processing results and actionable validation errors to the frontend. The example directory 'apps/backend/dataset/upload_yolo_data/' describes the expected dataset structure for development and testing only; it must not be treated as a required runtime path or a source of uploaded data.",
+      "status": "passing",
+      "verification": [
+        "Upload a valid Roboflow YOLO dataset folder from a client computer through the frontend and verify that the backend receives and processes its contents successfully.",
+        "Verify that dataset processing uses the uploaded files received through the API rather than reading from apps/backend/dataset/upload_yolo_data/ or another hardcoded server-side directory.",
+        "Verify that the upload works when the client computer and backend service run on different machines.",
+        "Verify that the backend can process an uploaded dataset without requiring the original dataset directory to exist on the server.",
+        "Verify that data.yaml is parsed successfully and that its class definitions and relevant dataset configuration are extracted.",
+        "Process 'Patient_0001_28-10-2025_Top-left_JPG.rf.75fbf8fea405a4f60b0633e71094cb3c.jpg' and verify that the extracted patient profile is 'Patient_0001', collection date is 28-10-2025, and image angle is 'Top-left'.",
+        "Verify that filenames containing Top-left, Top-middle, Top-right, Central-left, Central-middle, Central-right, Bottom-left, Bottom-middle, and Bottom-right are parsed correctly.",
+        "Verify that multiple images belonging to the same patient and collection date are associated with the same patient profile and collection session.",
+        "Verify that supported image files are discovered without relying on a fixed number of images per patient.",
+        "Verify that malformed filenames and invalid collection dates produce actionable validation errors rather than incorrect metadata.",
+        "Verify that missing data.yaml or an invalid uploaded dataset structure produces an appropriate validation error.",
+        "Verify that image-to-annotation associations follow the actual YOLO dataset export structure and that missing or malformed annotations are reported according to the dataset requirements.",
+        "Verify that duplicate filenames and conflicting metadata are handled according to the defined dataset policy.",
+        "Verify that uploaded image filenames and annotation contents are preserved during processing.",
+        "Verify that upload size limits, unsupported file types, malformed archives, and other invalid inputs are handled safely.",
+        "Run relevant backend unit tests, integration tests, lint checks, and build or type-check commands."
+      ],
+      "evidence": [
+        "pnpm --filter backend test passed: 16 tests",
+        "pnpm lint_be passed",
+        "pnpm --filter backend exec tsc --noEmit passed",
+        "pnpm lint_fe && pnpm --filter frontend exec tsc -b && pnpm --filter frontend build passed",
+        "./init.sh passed",
+        "Live backend smoke upload: valid ZIP returned HTTP 202 and structured train split, patient/date/angle, and annotation metadata",
+        "Live backend smoke upload also validated the expected 15 GB multipart endpoint and temporary extraction path"
+      ],
+      "notes": "Implemented browser folder-relative and ZIP multipart uploads through /api/v2/data/dataset-upload. The backend reconstructs or extracts uploads under a temporary directory, validates data.yaml, splits and annotations, preserves source filenames and content, and returns structured results. Missing annotations are warnings; malformed present annotations are errors. Browser folder upload depends on browser support for input webkitdirectory; archive upload is the portable fallback. Live smoke verification covered a valid ZIP export; malformed archive and browser folder transport still warrant client-specific browser testing."
     }
   ]
 }
