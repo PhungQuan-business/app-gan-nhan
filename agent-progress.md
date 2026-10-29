@@ -153,3 +153,15 @@
 - Files or artifacts updated: `apps/backend/src/data/`, `apps/backend/tests/data/yolo-dataset.service.test.ts`, `apps/frontend/src/features/data/services/data.api.ts`, `apps/frontend/src/pages/app-home-page.tsx`, `apps/frontend/src/App.css`, `feature_list.json`, `agent-progress.md`, package manifests and lockfile.
 - Known risk or unresolved issue: Browser-specific folder transport and malformed archive edge cases should receive manual browser coverage; live database persistence, model training, and client files over a true network boundary remain outside this feature's scope.
 - Next best step: Keep the verified upload workflow as the baseline and continue with subsequent data-management features.
+
+### Session 013
+
+- Date: 2026-10-29
+- Goal: Review the updated AGENTS.md documentation rule and document the upload implementation.
+- Completed: Tightened the repository instruction to require function-level TSDoc/JSDoc and comments for non-obvious internal code blocks. Added function documentation and intent comments across the upload route, controller, dataset service, frontend API, and workspace upload page; corrected the required session-log artifact name to `agent-progress.md`.
+- Verification run: `pnpm lint_be`; `pnpm lint_fe`; `pnpm --filter backend test`; `pnpm --filter backend exec tsc --noEmit`; `pnpm --filter frontend exec tsc -b`; `pnpm --filter frontend build`.
+- Evidence captured: Backend and frontend lint passed, 16 backend tests passed, backend TypeScript compilation passed, and the frontend TypeScript and production builds passed.
+- Commits: pending documentation commit.
+- Files or artifacts updated: `AGENTS.md`, `agent-progress.md`, backend upload route/controller/service, frontend upload service, and workspace upload page.
+- Known risk or unresolved issue: Documentation coverage is complete for the upload feature touched by this update; older unrelated functions elsewhere in the repository are outside this documentation pass.
+- Next best step: Apply the clarified documentation standard consistently when changing additional features.

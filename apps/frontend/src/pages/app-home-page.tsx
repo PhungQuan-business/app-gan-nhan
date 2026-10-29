@@ -23,6 +23,11 @@ const appPages: AppPage[] = [
 
 const navigationGroups = ['Data', 'Models', 'Deploy']
 
+/**
+ * Read and validate the signed-in user snapshot stored by the authentication flow.
+ *
+ * @returns A typed user when session storage contains valid data, otherwise null.
+ */
 function readAuthUser(): AuthUser | null {
     const rawUser = sessionStorage.getItem('authUser')
     if (!rawUser) return null
@@ -46,11 +51,21 @@ function readAuthUser(): AuthUser | null {
     return null
 }
 
+/**
+ * Resolve the workspace page requested by the view query parameter.
+ *
+ * @returns The matching navigation page, or the Upload Data default.
+ */
 function getSelectedPage(): AppPage {
     const selectedId = new URLSearchParams(window.location.search).get('view') ?? 'upload-data'
     return appPages.find((page) => page.id === selectedId) ?? appPages[0]
 }
 
+/**
+ * Render dataset selection, upload status, and structured processing feedback.
+ *
+ * @returns The Upload Data workspace page.
+ */
 function UploadDataPage() {
     const zipInputRef = useRef<HTMLInputElement>(null)
     const folderInputRef = useRef<HTMLInputElement>(null)
@@ -59,12 +74,21 @@ function UploadDataPage() {
     const [result, setResult] = useState<DatasetUploadResult | null>(null)
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
+    /**
+     * Replace the selected dataset files and clear stale processing feedback.
+     *
+     * @param event File-input change event containing the current selection.
+     */
     function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
+        // Replacing the selection clears stale results so status reflects current files.
         setSelectedFiles(Array.from(event.currentTarget.files ?? []))
         setResult(null)
         setErrorMessage(null)
     }
 
+    /**
+     * Submit the selected dataset and maintain pending and result UI state.
+     */
     async function handleUpload() {
         if (!selectedFiles.length || uploading) return
         setUploading(true)
@@ -133,6 +157,12 @@ function UploadDataPage() {
     )
 }
 
+/**
+ * Render a temporary workspace destination for navigation entries not implemented yet.
+ *
+ * @param page Navigation page metadata to display.
+ * @returns The placeholder page content.
+ */
 function PlaceholderPage({ page }: { page: AppPage }) {
     return (
         <section className="workspace-intro placeholder-page" aria-labelledby="workspace-page-title">
@@ -149,10 +179,18 @@ function PlaceholderPage({ page }: { page: AppPage }) {
     )
 }
 
+/**
+ * Render the shared authenticated application workspace and selected destination.
+ *
+ * @returns The main application shell.
+ */
 export function AppHomePage() {
     const user = readAuthUser()
     const selectedPage = getSelectedPage()
 
+    /**
+     * Clear the local authentication snapshot and return to login.
+     */
     function handleLogout() {
         sessionStorage.removeItem('accessToken')
         sessionStorage.removeItem('authUser')

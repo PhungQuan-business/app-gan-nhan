@@ -28,7 +28,15 @@ If baseline fails, fix it first.
 - Code added does not mean feature done.
 - Never change verification rules silently.
 - Prefer repo artifacts over chat summaries.
-- Artifacts: `feature_list.json` (feature state), `agent-progress.md` (log), `init.sh` (startup), `DESIGN.MD`, `session-handoff.md`(optional).
+- Document every declared function at its public boundary with a concise description, parameters, return behavior, and errors or side effects when relevant. Use JSDoc/TSDoc-style comments where the language supports them.
+- Explain non-obvious code blocks inside functions with a short comment that describes intent before the block. Do not add comments to self-explanatory statements.
+
+## Required artifacts
+`feature_list.json`: source of truth for feature state
+`agent-progress.md`: session log and current verified status
+`init.sh`: standard startup and verification path
+`DESIGN.md`: design instruction for building frontend
+`session-handoff.md`: optional compact handoff for larger sessions
 
 ## Coding Style
 
@@ -50,6 +58,7 @@ Layout:
 - `scripts/`: install, verify, prisma smoke test.
 - `tests/`: mirrors `src/`. Files end in `.test.ts`.
 - `dist/`: build output. Never edit or commit.
+- `dataset/`: example of input and output data
 
 Rules:
 - New feature: new `src/<feature>/` folder, mount router in `app.ts`, add tests.

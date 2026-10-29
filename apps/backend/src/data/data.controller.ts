@@ -3,11 +3,21 @@ import type { Express } from "express";
 import { rm } from "node:fs/promises";
 import * as dataService from "./data.service.js";
 
+/**
+ * Process request-uploaded dataset files and return validation or processing results.
+ *
+ * @param req Express request containing Multer-uploaded files.
+ * @param res Express response used for the structured JSON payload.
+ * @param next Express error-forwarding callback for unexpected failures.
+ * @returns A promise that resolves after the response lifecycle completes.
+ */
 export async function processUploadData(
   req: Request,
   res: Response,
   next: NextFunction,
 ) {
+  // Keep uploaded temporary files isolated to this request, then clean them
+  // whether processing succeeds, returns validation errors, or throws.
   let cleanup: (() => Promise<void>) | undefined;
   try {
     const files = req.files as Express.Multer.File[] | undefined;

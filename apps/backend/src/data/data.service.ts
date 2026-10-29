@@ -31,12 +31,24 @@ export type ProcessUploadResult = {
   errors: DatasetValidation[];
 };
 
+/**
+ * Normalize a client-provided relative path and reject absolute or escaping paths.
+ *
+ * @param value Browser-relative path to validate.
+ * @returns A normalized forward-slash path, or null when it is unsafe.
+ */
 function safeRelativePath(value: string): string | null {
   const normalized = normalize(value).replace(/\\/g, "/");
   if (normalized.startsWith("/") || normalized === ".." || normalized.startsWith("../") || normalized.includes("\0")) return null;
   return normalized;
 }
 
+/**
+ * Check whether a filesystem path exists without converting missing paths into errors.
+ *
+ * @param path Filesystem path to inspect.
+ * @returns True when the path exists; false for missing or inaccessible entries.
+ */
 async function pathExists(path: string): Promise<boolean> {
   try {
     await lstat(path);
@@ -46,6 +58,13 @@ async function pathExists(path: string): Promise<boolean> {
   }
 }
 
+/**
+ * Recursively collect regular files below a dataset directory.
+ *
+ * @param root Root directory used when recursion first begins.
+ * @param current Directory being traversed, defaulting to the root.
+ * @returns Absolute paths for all regular files found below the current directory.
+ */
 async function listFiles(root: string, current = root): Promise<string[]> {
   const entries = await readdir(current, { withFileTypes: true });
   const files: string[] = [];
@@ -57,6 +76,12 @@ async function listFiles(root: string, current = root): Promise<string[]> {
   return files;
 }
 
+/**
+ * Extract Roboflow patient, collection-date, and image-angle metadata from an image name.
+ *
+ * @param filename Image filename or path.
+ * @returns Parsed metadata, or null when the name or calendar date is invalid.
+ */
 export function parseFilename(filename: string): { patientProfile: string; collectionDate: string; angle: string } | null {
   const bareName = basename(filename, extname(filename));
   const anglePattern = Array.from(supportedAngles).map((angle) => angle.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|");
@@ -78,11 +103,19 @@ export function parseFilename(filename: string): { patientProfile: string; colle
   return { patientProfile, collectionDate, angle };
 }
 
+/**
+ * Reconstruct folder uploads or safely extract an archive into an isolated temporary directory.
+ *
+ * @param files Multer files carrying browser-relative names and temporary disk paths.
+ * @returns The prepared dataset root and cleanup callback.
+ * @throws An HTTP-shaped error for unsafe paths, multiple archives, or upload-size violations.
+ */
 async function prepareUpload(files: Express.Multer.File[]): Promise<{ root: string; cleanup: () => Promise<void> }> {
   const root = join(tmpdir(), `gan-nhan-dataset-${randomUUID()}`);
   await mkdir(root, { recursive: true });
 
   try {
+    // ZIP transport is mutually exclusive with folder-file reconstruction.
     const zipFiles = files.filter((file) => /\.(zip)$/i.test(file.originalname));
     if (zipFiles.length > 1) throw Object.assign(new Error("Only one dataset ZIP archive may be uploaded."), { status: 400 });
 
@@ -106,6 +139,7 @@ async function prepareUpload(files: Express.Multer.File[]): Promise<{ root: stri
     if (zipFiles.length === 1) {
       const zipFile = zipFiles[0];
       if (!zipFile) throw Object.assign(new Error("Dataset ZIP archive was not found."), { status: 400 });
+      // Inspect every entry before extraction so traversal and size limits are enforced.
       const zip = new AdmZip(zipFile.path);
       const entries = zip.getEntries();
       let uncompressedSize = 0;
@@ -126,6 +160,12 @@ async function prepareUpload(files: Express.Multer.File[]): Promise<{ root: stri
   }
 }
 
+/**
+ * Locate the single directory that owns the dataset data.yaml file.
+ *
+ * @param files Absolute paths in the prepared dataset.
+ * @returns The owning directory, or null when configuration is absent or ambiguous.
+ */
 function findDatasetRoot(files: string[]): string | null {
   const configFiles = files.filter((file) => basename(file).toLowerCase() === "data.yaml");
   if (configFiles.length !== 1) return null;
@@ -133,6 +173,12 @@ function findDatasetRoot(files: string[]): string | null {
   return configFile ? dirname(configFile) : null;
 }
 
+/**
+ * Validate one non-empty YOLO detection line against normalized coordinate rules.
+ *
+ * @param line A class ID followed by center and dimension values.
+ * @returns True when the line has five valid finite numeric values.
+ */
 function validateYoloLine(line: string): boolean {
   if (!line.trim()) return true;
   const parts = line.trim().split(/\s+/);
@@ -148,6 +194,13 @@ function validateYoloLine(line: string): boolean {
   return Number.isInteger(classId) && classId >= 0 && centerX >= 0 && centerX <= 1 && centerY >= 0 && centerY <= 1 && width > 0 && width <= 1 && height > 0 && height <= 1;
 }
 
+/**
+ * Prepare and validate an uploaded Roboflow YOLO dataset, returning structured metadata.
+ *
+ * @param files Uploaded folder files or one ZIP archive from Multer.
+ * @returns Processing results and a callback that removes temporary dataset files.
+ * @throws HTTP-shaped errors for empty uploads or preparation failures.
+ */
 export async function processUploadedDataset(files: Express.Multer.File[]): Promise<{ result: ProcessUploadResult; cleanup: () => Promise<void> }> {
   if (!files.length) throw Object.assign(new Error("No dataset files were uploaded."), { status: 400 });
 
@@ -174,6 +227,7 @@ export async function processUploadedDataset(files: Express.Multer.File[]): Prom
       return { result: { datasetRoot: relative(prepared.root, datasetRoot), config: {}, classes: [], splits: [], images: [], collectionSessions: [], warnings, errors }, cleanup: prepared.cleanup };
     }
 
+    // Configuration names may be an array or an indexed mapping.
     const names = config.names ?? config.names;
     const classes = Array.isArray(names) ? names.map(String) : names && typeof names === "object" ? Object.keys(names as Record<string, unknown>).sort((a, b) => Number(a) - Number(b)).map((key) => String((names as Record<string, unknown>)[key])) : [];
 
@@ -182,6 +236,7 @@ export async function processUploadedDataset(files: Express.Multer.File[]): Prom
     const images: ProcessUploadResult["images"] = [];
     const filenames = new Set<string>();
 
+    // Discover supported splits independently so exports need not contain fixed patient counts.
     for (const splitName of splitNames) {
       const splitPath = join(datasetRoot, splitName);
       if (!await pathExists(splitPath)) continue;
@@ -222,6 +277,7 @@ export async function processUploadedDataset(files: Express.Multer.File[]): Prom
 
     if (!splits.length) errors.push({ code: "MISSING_SPLIT", message: "No supported dataset split containing images was found (train, valid, validation, or test)." });
 
+    // Aggregate images that share a patient and collection day into one profile session.
     const sessions = new Map<string, number>();
     for (const image of images) {
       const key = `${image.patientProfile}\0${image.collectionDate}`;

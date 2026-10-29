@@ -1,5 +1,6 @@
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? '/api/v2').replace(/\/$/, '')
 
+
 export type DatasetValidation = {
     code: string
     message: string
@@ -17,6 +18,12 @@ export type DatasetUploadResult = {
     errors: DatasetValidation[]
 }
 
+/**
+ * Extract a useful API error message from an unknown JSON response.
+ *
+ * @param result Parsed response body.
+ * @returns The server message when available, otherwise a client-safe fallback.
+ */
 function uploadErrorMessage(result: unknown): string {
     if (typeof result === 'object' && result !== null && 'message' in result && typeof result.message === 'string') {
         return result.message
@@ -24,12 +31,20 @@ function uploadErrorMessage(result: unknown): string {
     return 'The dataset could not be uploaded.'
 }
 
+/**
+ * Enforce the client limit and multipart-upload a selected folder or ZIP archive.
+ *
+ * @param files Browser files, preserving each folder relative path when provided.
+ * @returns Structured dataset-processing results from the backend.
+ * @throws An Error for client size violations, network/API failures, or invalid responses.
+ */
 export async function uploadDataset(files: File[]): Promise<DatasetUploadResult> {
     const totalSize = files.reduce((total, file) => total + file.size, 0)
     if (totalSize > 15_000_000_000) {
         throw new Error('The selected dataset exceeds the 15 GB upload limit.')
     }
 
+    // Browser folder selection supplies relative paths; fallback names remain portable.
     const formData = new FormData()
     for (const file of files) {
         const relativePath = Object.prototype.hasOwnProperty.call(file, 'webkitRelativePath')
